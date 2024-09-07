@@ -25,23 +25,28 @@ public class WFCoreRecipeMaps {
             .progressBar(GuiTextures.PROGRESS_BAR_ARROW_MULTIPLE)
             .build();
 
-    public static final RecipeMap<SimpleRecipeBuilder> STEAM_WIREMILL_RECIPES = new RecipeMapBuilder<>("steam_wiremill",
+    public static final RecipeMap<SimpleRecipeBuilder> Steam_PCB_Factory_Recipes = new RecipeMapBuilder<>("steam_pcb_factory",
             new SimpleRecipeBuilder())
-            .itemInputs(1)
+            .itemInputs(2)
             .itemOutputs(1)
             .fluidInputs(0)
             .fluidOutputs(0)
-            .progressBar(GuiTextures.PROGRESS_BAR_WIREMILL)
+            .progressBar(GuiTextures.PROGRESS_BAR_ARC_FURNACE)
             .build();
-    public static final RecipeMap<PrimitiveRecipeBuilder> ALLOY_KILN_RECIPES = new RecipeMapBuilder<>("alloy_kiln",
+    public static final RecipeMap<PrimitiveRecipeBuilder> Large_Blast_Furnace = new RecipeMapBuilder<>("large_blast_furnace",
             new PrimitiveRecipeBuilder())
             .itemInputs(2)
-            .itemOutputs(2)
+            .itemOutputs(1)
             .fluidInputs(0)
-            .fluidOutputs(0)
-            .progressBar(GuiTextures.PROGRESS_BAR_WIREMILL)
+            .fluidOutputs(1)
+            .progressBar(GuiTextures.PROGRESS_BAR_ARROW)
             .build();
-
-
-
+    public static final RecipeMap<PrimitiveRecipeBuilder> StrandCaster = new RecipeMapBuilder<>("strand_caster",
+            new PrimitiveRecipeBuilder())
+            .itemInputs(1)
+            .itemOutputs(1)
+            .fluidInputs(2)
+            .fluidOutputs(1)
+            .progressBar(GuiTextures.PROGRESS_BAR_ARROW)
+            .build();
 }

@@ -11,51 +11,30 @@ wfcore.machine.largesteamcentrifuge.name=Large Steam Centrifuge
 wfcore.machine.largesteammixer.name=Large Steam Mixer
 wfcore.machine.steam_wiremill.name=Steam Wiremill
 wfcore.machine.steam_wiremill.tooltip=Lrdshittic coding
+wfcore.machine.largeblastfurnace.name=Large Blast Furnace
+wfcore.machine.largeblastfurnace.tooltip=Made by §6§kXXX§r§6Lrd§r§bmtns§kXXX§r
+recipemap.large_blast_furnace.name=Large Blast Furnace
+wfcore.machine.strandcaster.name=Strand Caster
+wfcore.machine.strandcaster.tooltip=Made by §6§kXXX§r§6Lrd§r§bmtns§kXXX§r
 recipemap.steam_wiremill.name=Steam Wiremill
-recipemap.alloy_kiln.name=Alloy Kiln
-wfcore.machine.alloy_kiln.name=Alloy Kiln
-wfcore.machine.large_primitive_blast_furnace.name=Large Primitive Blast Furnace
+gregtech.machine.steam_pcb_factory.name=Steam PCB Factory
+recipemap.steam_pcb_factory.name=Steam PCB Factory
+gregtech.material.advanced_alloy=Advanced Alloy
+gregtech.material.workers_alloy=Desh
+gregtech.material.unobtainium=Unobtainium
+gregtech.material.unobtainium.tooltip=Atm referance:interrobang:
+gregtech.material.c_m_b_steel=CMB Steel
+gregtech.material.schrabidium=Schrabidium
+gregtech.material.australium=Australium
+gregtech.material.verticium=Verticium
 
 gregtech.machine.boiler_tower.height=Stack Height: %s §9blocks
 
-#Computer
-wfcore.machine.computingserver.name=Computing Server
-wfcore.multiblock.computingserver.threshold_decrement=§aHere (Off On)
-wfcore.multiblock.computingserver.threshold_increment=§cHere (On Overclock)
-wfcore.multiblock.computingserver.description=The Computing Center Server is your only way to gain computing power in the early game. Each server has three rows and four columns of computing components, totaling 12 modules. From top to bottom, they are [Auxiliary Computing Module/High-Performance Computing Module/Data Cache Module]. Each row can only contain the corresponding components, but the levels can be different, and empty frames can also be used for filling. When the total RAM exceeds the combined CPU and GPU, the total computing power is the sum of CPU and GPU; otherwise, it is the sum of RAM. Unit heat is determined by CPU sum * GPU sum. When the temperature is below 300 degrees, it computes normally; above 300 degrees, performance is halved; above 450 degrees, it forces shutdown. In overclocking mode, computing performance doubles, heat quadruples, coolant consumption quadruples, and overall cooling performance doubles. Coolant types/cooling performance (Water-7.7/10mb, Coolant-14.4/5mb, Liquid Nitrogen-28.8/1mb). The machine cannot cool down with coolant while shut down!
-wfcore.multiblock.computingserver.eu=Power Consumption: %s EUt Base Heat: %s
-wfcore.multiblock.computingserver.start=Working Status: %s (Off=0 On=1 Overclock=2)
-wfcore.multiblock.computingserver.normal=§aNormal Efficiency Calculation.
-wfcore.multiblock.computingserver.lack=§cInsufficient Memory!
-wfcore.multiblock.computingserver.water.amount=Water: %s Coolant: %s
-wfcore.multiblock.computingserver.gpu=GPU: %s %s %s %s
-wfcore.multiblock.computingserver.cpu=CPU: %s %s %s %s
-wfcore.multiblock.computingserver.ram=RAM: %s %s %s %s
-wfcore.multiblock.computingserver.cwtt=Computational Power: %s CWU Heat: %s
-wfcore.multiblock.computingserver.hot=High Temperature, Computational Performance Decreases!
-gregtech.machine.hpca.component_type.computation_cwut=§9Computation: §f%,d TFLOP/t
-gregtech.recipe.computation_per_tick=Min. Computation: %,d TFLOP/t
-gregtech.recipe.total_computation=Computation: %,d TFLOP
-tile.computer_part.computer_vent.name=Empty Computing Frame
-tile.computer_part.computer_rami.name=Data Cache Module I (RAM)
-tile.computer_part.computer_ramii.name=Data Cache Module II (RAM)
-tile.computer_part.computer_ramiii.name=Data Cache Module III (RAM)
-tile.computer_part.computer_cpui.name=High-Performance Computing Module I (CPU)
-tile.computer_part.computer_cpuii.name=High-Performance Computing Module II (CPU)
-tile.computer_part.computer_cpuiii.name=High-Performance Computing Module III (CPU)
-tile.computer_part.computer_gpui.name=Auxiliary Computing Module I (GPU)
-tile.computer_part.computer_gpuii.name=Auxiliary Computing Module II (GPU)
-tile.computer_part.computer_gpuiii.name=Auxiliary Computing Module III (GPU)
+# Ore Prefixes
 
-tile.computer_part.computer_rami.tooltip=Eight hundred plus eight hundred equals sixteen hundred
-tile.computer_part.computer_ramii.tooltip=Remember everything!
-tile.computer_part.computer_ramiii.tooltip=DDR114514
-tile.computer_part.computer_cpui.tooltip=Centimeter-grade technology
-tile.computer_part.computer_cpuii.tooltip=Human Column Computer
-tile.computer_part.computer_cpuiii.tooltip=Whoa, Atomic
-tile.computer_part.computer_gpui.tooltip=Soviet Military Engineering
-tile.computer_part.computer_gpuii.tooltip=Goblin Manufacturing
-tile.computer_part.computer_gpuiii.tooltip=Sunway TaihuLight!
-
-#Radar
-wfcore.multiblock.radar.name=Base radar
+item.material.oreprefix.billet=%s Billet
+item.material.oreprefix.ntmpipe=%s Pipe
+item.material.oreprefix.wiredense=%s Dense Wire
+item.material.oreprefix.shell=%s Shell
+item.material.oreprefix.plateTriple=Cast %s Plate
+item.material.oreprefix.plateSextuple=Welded %s Plate

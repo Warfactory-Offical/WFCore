@@ -55,8 +55,7 @@ public class MultiblockRadarLogic {
     //Perhaps some visualization in the tablet?
     //OPTIONAL: integrate Map mod with the mod, so players have bounding boxes drawn on their minimap, with all valid TEs  pointed out and waypoints to the centers
 
-
-   public void performScan() {
+    public void performScan() {
        if (metaTileEntity.getWorld().isRemote)
            return;
 
@@ -218,6 +217,7 @@ public class MultiblockRadarLogic {
 
     public NBTTagCompound writeToNBT(NBTTagCompound data) {
         //FIXME
+        return null;
     }
 }
 

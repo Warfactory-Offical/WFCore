@@ -20,6 +20,7 @@ public class WFCoreMaterials {
 
 
         FirstDegreeMaterials.register();
+        HbmMaterials.register();
         /*
          * FOR ADDON DEVELOPERS:
          *
@@ -43,6 +44,13 @@ public class WFCoreMaterials {
         ;
 
     }
-    public static Material Dirt;
+    public static Material AdvancedAlloy;
+    public static Material Desh;
+    public static Material Australium;
+    public static Material Schrabidium;
+    public static Material Unobtainium;
+    public static Material CMBSteel;
+    public static Material Neoveline;
+    public static Material Verticium;
 
 }

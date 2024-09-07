@@ -2,50 +2,42 @@ package wfcore.common.metatileentities;
 
 
 
+
+import wfcore.common.metatileentities.multi.primitive.MetaTileEntityStrandCaster;
+import wfcore.common.metatileentities.multi.primitive.MetaTileEntityWarfactoryBlastFurnace;
 import net.minecraft.util.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
-import wfcore.common.metatileentities.multi.MetaTileEntityAlloyKiln;
+import gregtech.api.util.GTLog;
 import wfcore.common.metatileentities.multi.MetaTileEntityBoilerTower;
-import wfcore.common.metatileentities.multi.MetaTileEntityLargePrimitiveBlastFurnace;
-import wfcore.common.metatileentities.multi.MetaTileEntityRadar;
 import wfcore.common.metatileentities.multi.electric.*;
-import wfcore.common.metatileentities.multi.electric.computing.MetaTileEntityComputingServer;
 import wfcore.common.metatileentities.multi.steam.*;
 
+import static gregtech.api.util.GTUtility.gregtechId;
 import static gregtech.common.metatileentities.MetaTileEntities.*;
 
 public class WFCoreMetaTileEntities {
 
     public static MetaTileEntityProjector PROJECTOR;
-    public static MetaTileEntityLargeSteamForgeHammer LARGESTEAMFORGEHAMMER;
-    public static MetaTileEntityLargeSteamCompressor LARGESTEAMCOMPRESSOR;
-    public static MetaTileEntityLargeSteamWasher LARGESTEAMWASHER;
-    public static MetaTileEntityLargeSteamCentrifuge LARGESTEAMCENTRIFUGE;
-    public static MetaTileEntityLargeSteamMixer LARGESTEAMMIXER;
-    public static MetaTileEntitySteamWiremill STEAMWIREMILL;
-    public static MetaTileEntityBoilerTower BOILERTOWER;
-    public static MetaTileEntityComputingServer COMPUTINGSERVER;
-    public static MetaTileEntityLargePrimitiveBlastFurnace LARGE_PRIMITIVE_BLAST_FURNACE;
-    public static MetaTileEntityAlloyKiln ALLOY_KILN;
-    public static MetaTileEntityRadar RADAR;
 
-    public static int id = 0;
+    public static MetaTileEntityBoilerTower BOILERTOWER;
+    public static SteamPCBFactory STEAM_PCB_FACTORY_STEEL;
+    public static MetaTileEntityWarfactoryBlastFurnace LARGEBLASTFURNACE;
+    public static MetaTileEntityStrandCaster STRANDCASTER;
+
+
+    public static int id = 10000;
 
     public static void init() {
         //Multis
         PROJECTOR = registerMetaTileEntity(id++, new MetaTileEntityProjector(location("projector")));
-        LARGESTEAMFORGEHAMMER = registerMetaTileEntity(id++, new MetaTileEntityLargeSteamForgeHammer(location("largesteamforgehammer")));
-        LARGESTEAMCOMPRESSOR = registerMetaTileEntity(id++, new MetaTileEntityLargeSteamCompressor(location("largesteamcompressor")));
-        LARGESTEAMWASHER = registerMetaTileEntity(id++, new MetaTileEntityLargeSteamWasher(location("largesteamwasher")));
-        LARGESTEAMCENTRIFUGE = registerMetaTileEntity(id++, new MetaTileEntityLargeSteamCentrifuge(location("largesteamcentrifuge")));
-        LARGESTEAMMIXER = registerMetaTileEntity(id++, new MetaTileEntityLargeSteamMixer(location("largesteammixer")));
-        STEAMWIREMILL = registerMetaTileEntity(id++, new MetaTileEntitySteamWiremill(location("steamwiremill")));
         BOILERTOWER = registerMetaTileEntity(id++, new MetaTileEntityBoilerTower(location("boilertower")));
-        COMPUTINGSERVER = registerMetaTileEntity(id++, new MetaTileEntityComputingServer(location("computingserver")));
-        LARGE_PRIMITIVE_BLAST_FURNACE = registerMetaTileEntity(id++, new MetaTileEntityLargePrimitiveBlastFurnace(location("large_primitive_blast_furnace")));
-        ALLOY_KILN = registerMetaTileEntity(id++, new MetaTileEntityAlloyKiln(location("alloy_kiln")));
-        RADAR = registerMetaTileEntity(id++, new MetaTileEntityRadar(location("radar")));
+        LARGEBLASTFURNACE = registerMetaTileEntity(id++, new MetaTileEntityWarfactoryBlastFurnace(location("largeblastfurnace")));
+        STRANDCASTER = registerMetaTileEntity(id++, new MetaTileEntityStrandCaster(location("strandcaster")));
+        GTLog.logger.info("Who the fuck reads these lmaoooo");
+        STEAM_PCB_FACTORY_STEEL = registerMetaTileEntity(id++,
+                new SteamPCBFactory(gregtechId("steam_pcb_factory"), true));
     }
+
 
     private static ResourceLocation location(@NotNull String name) {
         return new ResourceLocation("wfcore", name);
