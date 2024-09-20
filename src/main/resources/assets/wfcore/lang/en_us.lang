@@ -56,3 +56,6 @@ tile.computer_part.computer_cpuiii.tooltip=Whoa, Atomic
 tile.computer_part.computer_gpui.tooltip=Soviet Military Engineering
 tile.computer_part.computer_gpuii.tooltip=Goblin Manufacturing
 tile.computer_part.computer_gpuiii.tooltip=Sunway TaihuLight!
+
+#Radar
+wfcore.multiblock.radar.name=Base radar

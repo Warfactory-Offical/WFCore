@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import wfcore.common.metatileentities.multi.MetaTileEntityAlloyKiln;
 import wfcore.common.metatileentities.multi.MetaTileEntityBoilerTower;
 import wfcore.common.metatileentities.multi.MetaTileEntityLargePrimitiveBlastFurnace;
+import wfcore.common.metatileentities.multi.MetaTileEntityRadar;
 import wfcore.common.metatileentities.multi.electric.*;
 import wfcore.common.metatileentities.multi.electric.computing.MetaTileEntityComputingServer;
 import wfcore.common.metatileentities.multi.steam.*;
@@ -26,6 +27,7 @@ public class WFCoreMetaTileEntities {
     public static MetaTileEntityComputingServer COMPUTINGSERVER;
     public static MetaTileEntityLargePrimitiveBlastFurnace LARGE_PRIMITIVE_BLAST_FURNACE;
     public static MetaTileEntityAlloyKiln ALLOY_KILN;
+    public static MetaTileEntityRadar RADAR;
 
     public static int id = 0;
 
@@ -42,6 +44,7 @@ public class WFCoreMetaTileEntities {
         COMPUTINGSERVER = registerMetaTileEntity(id++, new MetaTileEntityComputingServer(location("computingserver")));
         LARGE_PRIMITIVE_BLAST_FURNACE = registerMetaTileEntity(id++, new MetaTileEntityLargePrimitiveBlastFurnace(location("large_primitive_blast_furnace")));
         ALLOY_KILN = registerMetaTileEntity(id++, new MetaTileEntityAlloyKiln(location("alloy_kiln")));
+        RADAR = registerMetaTileEntity(id++, new MetaTileEntityRadar(location("radar")));
     }
 
     private static ResourceLocation location(@NotNull String name) {
