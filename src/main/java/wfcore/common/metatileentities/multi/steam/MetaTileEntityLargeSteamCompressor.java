@@ -50,7 +50,7 @@ public class MetaTileEntityLargeSteamCompressor extends RecipeMapSteamMultiblock
 
     @Override
     protected BlockPattern createStructurePattern() {
-        return FactoryBlockPattern.start().start(RIGHT, FRONT, DOWN)
+        return FactoryBlockPattern.start(RIGHT, FRONT, DOWN)
                 .aisle("CCC", "CCC", "CCC", "CCC")
                 .aisle("CSC", "C#C", "C#C", "CCC")
                 .aisle("CCC", "CCC", "CCC", "CCC")
