@@ -17,6 +17,7 @@ import gregtech.api.metatileentity.multiblock.IMultiblockAbilityPart;
 import gregtech.api.metatileentity.multiblock.MultiblockAbility;
 import gregtech.api.metatileentity.multiblock.MultiblockControllerBase;
 import gregtech.client.renderer.texture.Textures;
+import gregtech.client.renderer.texture.cube.OrientedOverlayRenderer;
 import gregtech.client.renderer.texture.cube.SimpleOverlayRenderer;
 import gregtech.common.metatileentities.multi.multiblockpart.MetaTileEntityMultiblockNotifiablePart;
 import gregtech.common.metatileentities.multi.multiblockpart.MetaTileEntityObjectHolder;
@@ -30,6 +31,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.IItemHandler;
 import org.jetbrains.annotations.NotNull;
 import wfcore.api.capability.IDataSlot;
+import wfcore.textures.wfTextures;
 
 import java.util.Iterator;
 import java.util.List;
@@ -50,9 +52,7 @@ public class MetaTileEntityDataSlot extends MetaTileEntityMultiblockNotifiablePa
 
     protected ModularUI createUI(EntityPlayer entityPlayer) {
         return ModularUI.defaultBuilder().label(5, 5, this.getMetaFullName()).image(46, 18, 84, 60, GuiTextures.PROGRESS_BAR_RESEARCH_STATION_BASE)
-                .widget((new BlockableSlotWidget(this.heldItems, 0, 79, 39))
-                        .setIsBlocked(this::isSlotBlocked).setBackgroundTexture(new IGuiTexture[]{GuiTextures.SLOT, GuiTextures.RESEARCH_STATION_OVERLAY}))
-                .widget((new BlockableSlotWidget(this.heldItems, 0, 79, 39)).setIsBlocked(this::isSlotBlocked)
+                .widget((new BlockableSlotWidget(this.heldData, 0, 79, 39)).setIsBlocked(this::isSlotBlocked)
                         .setBackgroundTexture(new IGuiTexture[]{GuiTextures.SLOT, GuiTextures.DATA_ORB_OVERLAY}))
                 .bindPlayerInventory(entityPlayer.inventory)
                 .build(this.getHolder(), entityPlayer);
@@ -64,16 +64,16 @@ public class MetaTileEntityDataSlot extends MetaTileEntityMultiblockNotifiablePa
     }
 
     public void clearMachineInventory(NonNullList<ItemStack> itemBuffer) {
-        clearInventory(itemBuffer, this.heldItems);
+        clearInventory(itemBuffer, this.heldData);
     }
 
     @SideOnly(Side.CLIENT)
     public void renderMetaTileEntity(CCRenderState renderState, Matrix4 translation, IVertexOperation[] pipeline) {
         super.renderMetaTileEntity(renderState, translation, pipeline);
-        SimpleOverlayRenderer renderer = Textures.OBJECT_HOLDER_OVERLAY;
+        OrientedOverlayRenderer renderer = wfTextures.DATA_SLOT;
         MultiblockControllerBase controller = this.getController();
         if (controller != null && controller.isActive()) {
-            renderer = Textures.OBJECT_HOLDER_ACTIVE_OVERLAY;
+            renderer = wfTextures.DATA_SLOT;
         }
 
         renderer.renderSided(this.getFrontFacing(), renderState, translation, pipeline);
