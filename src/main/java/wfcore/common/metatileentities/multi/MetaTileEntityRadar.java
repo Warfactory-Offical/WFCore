@@ -2,7 +2,7 @@ package wfcore.common.metatileentities.multi;
 
 import gregtech.api.GTValues;
 import gregtech.api.capability.*;
-import gregtech.api.capability.impl.EnergyContainerHandler;
+import gregtech.api.capability.impl.EnergyContainerList;
 import gregtech.api.metatileentity.MetaTileEntity;
 import gregtech.api.metatileentity.interfaces.IGregTechTileEntity;
 import gregtech.api.metatileentity.multiblock.IMultiblockPart;
@@ -10,22 +10,19 @@ import gregtech.api.metatileentity.multiblock.MultiblockAbility;
 import gregtech.api.metatileentity.multiblock.MultiblockWithDisplayBase;
 import gregtech.api.pattern.BlockPattern;
 import gregtech.api.pattern.FactoryBlockPattern;
-import gregtech.api.pattern.PatternMatchContext;
-import gregtech.api.unification.material.Material;
 import gregtech.api.unification.material.Materials;
+import gregtech.api.util.GTUtility;
 import gregtech.client.renderer.ICubeRenderer;
 import gregtech.client.renderer.texture.Textures;
+import gregtech.common.ConfigHolder;
 import gregtech.common.blocks.BlockMetalCasing;
 import gregtech.common.blocks.MetaBlocks;
 import gregtech.common.blocks.StoneVariantBlock;
-import gregtech.common.blocks.material.GTBlockMaterials;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
-import net.minecraftforge.common.capabilities.Capability;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import wfcore.api.capability.IDataSlot;
@@ -46,6 +43,10 @@ public class MetaTileEntityRadar extends MultiblockWithDisplayBase implements IO
 
     public MetaTileEntityRadar(ResourceLocation metaTileEntityId) {
         super(metaTileEntityId);
+    }
+
+    public boolean isActive() {
+        return isStructureFormed();
     }
 
     @Override
@@ -70,6 +71,29 @@ public class MetaTileEntityRadar extends MultiblockWithDisplayBase implements IO
         tooltip.add(I18n.format("gregtech.tool_action.crowbar"));
     }
 
+    private void initializeAbilities() {
+        this.energyContainer = new EnergyContainerList(getAbilities(MultiblockAbility.INPUT_ENERGY));
+        this.minerLogic.setVoltageTier(GTUtility.getTierByVoltage(this.energyContainer.getInputVoltage()));
+        this.minerLogic.setOverclockAmount(
+                Math.max(1, GTUtility.getTierByVoltage(this.energyContainer.getInputVoltage()) - this.tier));
+        this.minerLogic.initPos(getPos(), this.minerLogic.getCurrentRadius());
+    }
+
+    public boolean drainEnergy(boolean simulate) {
+        long energyToDrain = GTValues.VA[getEnergyTier()];
+        long resultEnergy = energyContainer.getEnergyStored() - energyToDrain;
+        if (resultEnergy >= 0L && resultEnergy <= energyContainer.getEnergyCapacity()) {
+            if (!simulate)
+                energyContainer.changeEnergy(-energyToDrain);
+            return true;
+        }
+        return false;
+    }
+    public int getEnergyTier() {
+        if (energyContainer == null) return this.tier;
+        return Math.min(this.tier + 1,
+                Math.max(this.tier, GTUtility.getFloorTierByVoltage(energyContainer.getInputVoltage())));
+    }
 
 
     protected @NotNull BlockPattern createStructurePattern() {
