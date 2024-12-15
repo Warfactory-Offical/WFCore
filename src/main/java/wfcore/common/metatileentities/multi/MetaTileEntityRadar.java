@@ -1,5 +1,8 @@
 package wfcore.common.metatileentities.multi;
 
+import codechicken.lib.render.CCRenderState;
+import codechicken.lib.render.pipeline.IVertexOperation;
+import codechicken.lib.vec.Matrix4;
 import gregtech.api.GTValues;
 import gregtech.api.capability.*;
 import gregtech.api.capability.impl.EnergyContainerList;
@@ -14,7 +17,6 @@ import gregtech.api.unification.material.Materials;
 import gregtech.api.util.GTUtility;
 import gregtech.client.renderer.ICubeRenderer;
 import gregtech.client.renderer.texture.Textures;
-import gregtech.common.ConfigHolder;
 import gregtech.common.blocks.BlockMetalCasing;
 import gregtech.common.blocks.MetaBlocks;
 import gregtech.common.blocks.StoneVariantBlock;
@@ -23,9 +25,12 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import wfcore.api.capability.IDataSlot;
+import wfcore.api.capability.impl.radar.MultiblockRadarLogic.MultiblockRadarLogic;
 
 import java.util.List;
 
@@ -37,7 +42,7 @@ public class MetaTileEntityRadar extends MultiblockWithDisplayBase implements IO
     private IDataSlot dataSlot;
     private int tier;
     //TODO: implement logic
-    //private final RadarLogic radarLogic;
+    private final MultiblockRadarLogic radarLogic;
 
 
 
@@ -48,6 +53,7 @@ public class MetaTileEntityRadar extends MultiblockWithDisplayBase implements IO
     public boolean isActive() {
         return isStructureFormed();
     }
+
 
     @Override
     protected void updateFormedValid() {
@@ -73,10 +79,10 @@ public class MetaTileEntityRadar extends MultiblockWithDisplayBase implements IO
 
     private void initializeAbilities() {
         this.energyContainer = new EnergyContainerList(getAbilities(MultiblockAbility.INPUT_ENERGY));
-        this.minerLogic.setVoltageTier(GTUtility.getTierByVoltage(this.energyContainer.getInputVoltage()));
-        this.minerLogic.setOverclockAmount(
+        this.radarLogic.setVoltageTier(GTUtility.getTierByVoltage(this.energyContainer.getInputVoltage()));
+        this.radarLogic.setOverclockAmount(
                 Math.max(1, GTUtility.getTierByVoltage(this.energyContainer.getInputVoltage()) - this.tier));
-        this.minerLogic.initPos(getPos(), this.minerLogic.getCurrentRadius());
+        this.radarLogic.initPos(getPos(), this.radarLogic.getCurrentRadius());
     }
 
     public boolean drainEnergy(boolean simulate) {
@@ -161,6 +167,7 @@ public class MetaTileEntityRadar extends MultiblockWithDisplayBase implements IO
     @Override
     public MetaTileEntity createMetaTileEntity(IGregTechTileEntity iGregTechTileEntity) {
         return new MetaTileEntityRadar(metaTileEntityId);
+        this.radarLogic.getSpeed();
     }
 
 
@@ -172,6 +179,14 @@ public class MetaTileEntityRadar extends MultiblockWithDisplayBase implements IO
     @Override
     public void setWorkingEnabled(boolean b) {
 
+    }
+
+    @SideOnly(Side.CLIENT)
+    @Override
+    public void renderMetaTileEntity(CCRenderState renderState, Matrix4 translation, IVertexOperation[] pipeline) {
+        super.renderMetaTileEntity(renderState, translation, pipeline);
+        this.getFrontOverlay().renderOrientedState(renderState, translation, pipeline, getFrontFacing(),
+                this.radarLogic.isWorking(), this.isWorkingEnabled());
     }
 
     @Override
