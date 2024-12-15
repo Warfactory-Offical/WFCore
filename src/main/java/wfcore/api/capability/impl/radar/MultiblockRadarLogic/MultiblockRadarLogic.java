@@ -32,6 +32,9 @@ public class MultiblockRadarLogic {
         this.speed = speed;
 
     }
+    public static boolean isOnTEWhitelist(TileEntity tileEntity){
+        return TE_WHITELIST.contains(tileEntity);
+    }
 
     static public HashMap<Object, BlockPos> collectValidEntites(){
         World world = Minecraft.getMinecraft().world;
@@ -44,6 +47,10 @@ public class MultiblockRadarLogic {
             }
 
             List<TileEntity> worldTileEntites = world.loadedTileEntityList;
+            for(TileEntity tileEntity : worldTileEntites){
+                if(isOnTEWhitelist(tileEntity))
+                    entityPosMap.put(tileEntity,tileEntity.getPos());
+            }
 
         }
 
