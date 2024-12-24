@@ -1,14 +1,11 @@
 package wfcore.api.capability.impl.radar.MultiblockRadarLogic;
 
 import gregtech.api.metatileentity.MetaTileEntity;
-import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Tuple;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import org.apache.commons.math3.ml.clustering.Cluster;
 import org.apache.commons.math3.ml.clustering.DBSCANClusterer;
@@ -47,19 +44,19 @@ public class MultiblockRadarLogic {
         return new IntCoord2(pos);
     }
 
-    private HashMap<Object, IntCoord2> collectValidEntites() {
-        MinecraftServer serverInstance =  FMLCommonHandler.instance().getMinecraftServerInstance();
-        HashMap<Object, IntCoord2> entityPosMap = new HashMap<>();
+    private HashMap<IntCoord2, Object> collectValidEntites() {
+        MinecraftServer serverInstance = FMLCommonHandler.instance().getMinecraftServerInstance();
+        HashMap<IntCoord2, Object> entityPosMap = new HashMap<>();
 
-            List<EntityPlayerMP> worldPlayers = serverInstance.getPlayerList().getPlayers();
-            for(EntityPlayerMP player :  worldPlayers){
-                entityPosMap.put(player, getCoordPair(player.getPosition()));
-            }
+        List<EntityPlayerMP> worldPlayers = serverInstance.getPlayerList().getPlayers();
+        for (EntityPlayerMP player : worldPlayers) {
+            entityPosMap.put(getCoordPair(player.getPosition()), player);
+        }
 
-            List<TileEntity> worldTileEntites = serverInstance.getEntityWorld().loadedTileEntityList;
-            for (TileEntity tileEntity : worldTileEntites) {
-                if (isOnTEWhitelist(tileEntity)) entityPosMap.put(tileEntity, getCoordPair(tileEntity.getPos()));
-            }
+        List<TileEntity> worldTileEntites = serverInstance.getEntityWorld().loadedTileEntityList;
+        for (TileEntity tileEntity : worldTileEntites) {
+            if (isOnTEWhitelist(tileEntity)) entityPosMap.put(getCoordPair(tileEntity.getPos()), tileEntity);
+        }
 
 
         return entityPosMap;
@@ -69,15 +66,13 @@ public class MultiblockRadarLogic {
     Async method that is supposed to calculate all data relating to base data, by obtaining list of TEs, finding their
     bounding boxes and centers.
      */
-    private CompletableFuture<List<ClusterData>> calculateDBSCAN(HashMap<Object, IntCoord2> objList) {
+    private CompletableFuture<List<ClusterData>> calculateDBSCAN(HashMap<IntCoord2, Object> objMap) {
 
         return CompletableFuture.supplyAsync(() -> {
-
             DBSCANClusterer<IntCoord2> dbscan = new DBSCANClusterer<>(EPS, MIN_PTS);
 
-            List<Cluster<IntCoord2>> clusters = dbscan.cluster(objList.values());
+            List<Cluster<IntCoord2>> clusters = dbscan.cluster(new ArrayList<>(objMap.keySet()));
 
-            //Preallocating size for some performance benefits
             List<ClusterData> clusterDataList = new ArrayList<>(clusters.size());
 
             for (Cluster<IntCoord2> cluster : clusters) {
@@ -86,7 +81,6 @@ public class MultiblockRadarLogic {
                 int minX = Integer.MAX_VALUE, minZ = Integer.MAX_VALUE;
                 int maxX = Integer.MIN_VALUE, maxZ = Integer.MIN_VALUE;
                 int sumX = 0, sumZ = 0;
-                int playerPopulation = 0;
 
                 for (IntCoord2 point : clusterPoints) {
                     int x = point.getX();
@@ -99,29 +93,33 @@ public class MultiblockRadarLogic {
 
                     sumX += x;
                     sumZ += z;
-
-                    if (isPlayerInCluster(objList, point)) {
-                        playerPopulation++;
-                    }
                 }
 
-                // Calculate bounding box and center
                 IntCoord2 boundingBoxMin = new IntCoord2(minX, minZ);
                 IntCoord2 boundingBoxMax = new IntCoord2(maxX, maxZ);
                 IntCoord2 clusterCenter = new IntCoord2(sumX / clusterPoints.size(), sumZ / clusterPoints.size());
 
-                clusterDataList.add(new ClusterData(clusterPoints, clusterCenter, new Tuple<>(boundingBoxMin, boundingBoxMax), playerPopulation));
-            }
+                int playerPopulation = calculatePlayerPopulation(objMap, clusterPoints);
 
+                clusterDataList.add(new ClusterData(
+                        clusterPoints,
+                        clusterCenter,
+                        new Tuple<>(boundingBoxMin, boundingBoxMax),
+                        playerPopulation
+                ));
+            }
             return clusterDataList;
         });
     }
-    private boolean isPlayerInCluster(Map<Object, IntCoord2> objList, IntCoord2 point) {
-        for (Map.Entry<Object, IntCoord2> entry : objList.entrySet()) {
-            if (entry.getValue().equals(point) && entry.getKey() instanceof EntityPlayerMP) {
+
+    private int calculatePlayerPopulation(HashMap<IntCoord2, Object> objMap, List<IntCoord2> clusterPoints) {
+        int population = 0;
+        for (IntCoord2 point : clusterPoints) {
+            if (objMap.get(point) instanceof EntityPlayerMP) {
+                population++;
             }
         }
-        return false;
+        return population;
     }
 
 
