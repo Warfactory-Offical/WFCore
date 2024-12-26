@@ -4,12 +4,12 @@ import gregtech.api.metatileentity.MetaTileEntity;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Tuple;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import org.apache.commons.math3.ml.clustering.Cluster;
 import org.apache.commons.math3.ml.clustering.DBSCANClusterer;
 import org.jetbrains.annotations.NotNull;
+import wfcore.api.utils.ClusterData;
 import wfcore.api.utils.IntCoord2;
 
 import java.util.*;
@@ -145,51 +145,5 @@ public class MultiblockRadarLogic {
         return false;
     }
 
-    private class ClusterData {
-        private final List<IntCoord2> coordinates;
-        private final IntCoord2 centerPoint;
-        private final BoundingBox boundingBox;
-        private final int playerPopulation;
-
-        public ClusterData(List<IntCoord2> coordinates, IntCoord2 centerPoint, BoundingBox boundingBox, int playerPopulation) {
-            this.coordinates = coordinates;
-            this.centerPoint = centerPoint;
-            this.boundingBox = boundingBox;
-            this.playerPopulation = playerPopulation;
-        }
-
-        public List<IntCoord2> getCoordinates() {
-            return coordinates;
-        }
-
-        public IntCoord2 getCenterPoint() {
-            return centerPoint;
-        }
-
-        public BoundingBox getBoundingBox() {
-            return boundingBox;
-        }
-
-        public int getPlayerPopulation() {
-            return playerPopulation;
-        }
-    }
-
-    private class BoundingBox {
-        private final IntCoord2 min, max;
-
-        BoundingBox(IntCoord2 min, IntCoord2 max) {
-            this.min = min;
-            this.max = max;
-        }
-
-        public IntCoord2 getMin() {
-            return min;
-        }
-
-        public IntCoord2 getMax() {
-            return max;
-        }
-    }
 }
 
