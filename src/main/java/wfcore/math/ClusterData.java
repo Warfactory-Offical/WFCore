@@ -1,6 +1,6 @@
-package wfcore.api.utils;
+package wfcore.math;
 
-import wfcore.api.capability.impl.radar.MultiblockRadarLogic.MultiblockRadarLogic;
+import wfcore.api.utils.IntCoord2;
 
 import java.util.List;
 
@@ -33,20 +33,4 @@ public class ClusterData {
         return playerPopulation;
     }
 
-    private class BoundingBox {
-        private final IntCoord2 min, max;
-
-        BoundingBox(IntCoord2 min, IntCoord2 max) {
-            this.min = min;
-            this.max = max;
-        }
-
-        public IntCoord2 getMin() {
-            return min;
-        }
-
-        public IntCoord2 getMax() {
-            return max;
-        }
-    }
 }

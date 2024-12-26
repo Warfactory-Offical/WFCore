@@ -8,33 +8,64 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import org.apache.commons.math3.ml.clustering.Cluster;
 import org.apache.commons.math3.ml.clustering.DBSCANClusterer;
-import org.jetbrains.annotations.NotNull;
-import wfcore.api.utils.ClusterData;
+import wfcore.math.ClusterData;
 import wfcore.api.utils.IntCoord2;
+import wfcore.math.BoundingBox;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 public class MultiblockRadarLogic {
+    //TODO: Perhaps make those values adjustable?
     public static final int MIN_PTS = 15;
     public static final int EPS = 10;
     private static final Set<Class<? extends TileEntity>> TE_WHITELIST = new HashSet<>();
 
+    private int voltageTier;
+    private int overclockAmount;
+    private int speed;
+    private Map<IntCoord2, Object> LoadedValidObjects  = new HashMap<>();
+    private List<ClusterData> scanResults = new ArrayList<>();
+    private MetaTileEntity metaTileEntity;
+    private boolean isFinished;
+    private boolean isActive = false;
+    private boolean isWorkingEnabled = true;
     static {
         //TODO: add any viable tileenttity from GT, AE2, WARFORGE and more
     }
 
-    private int voltageTier;
-    private int overclockAmount;
-    private int speed;
-    private MetaTileEntity MetaTileEntity;
 
-
-    public MultiblockRadarLogic(@NotNull MetaTileEntity MetaTileEntity, int speed) {
-        this.MetaTileEntity = MetaTileEntity;
+    public MultiblockRadarLogic(int voltageTier, int overclockAmount, int speed, gregtech.api.metatileentity.MetaTileEntity metaTileEntity) {
+        this.voltageTier = voltageTier;
+        this.overclockAmount = overclockAmount;
         this.speed = speed;
+        this.metaTileEntity = metaTileEntity;
+        this.isFinished = false;
 
     }
+
+   public void performScan() {
+       if (metaTileEntity.getWorld().isRemote)
+           return;
+
+      if(!this.isWorkingEnabled)
+          return;
+
+      if(!checkCanScan())
+          return;
+
+      //Scanner cannot perform a scan if data is already written
+     if(!dataSlotIsEmpty() && !dataSlotIsWritten()){
+                 //Get the snapshot of all loaded players TEs
+        this.LoadedValidObjects  = this.collectValidEntites();
+        calculateDBSCAN(LoadedValidObjects).thenAccept(clusterData -> {
+            this.scanResults = clusterData;
+        }).exceptionally(ex -> {
+            System.err.println("Error during DBSCAN calculation: " + ex.getMessage());
+            return null;
+        });
+     }
+   }
 
     public static boolean isOnTEWhitelist(TileEntity tileEntity) {
         return TE_WHITELIST.contains(tileEntity);
@@ -65,7 +96,7 @@ public class MultiblockRadarLogic {
     Async method that is supposed to calculate all data relating to base data, by obtaining list of TEs, finding their
     bounding boxes and centers.
      */
-    private CompletableFuture<List<ClusterData>> calculateDBSCAN(HashMap<IntCoord2, Object> objMap) {
+    private CompletableFuture<List<ClusterData>> calculateDBSCAN(Map<IntCoord2, Object> objMap) {
 
         return CompletableFuture.supplyAsync(() -> {
             DBSCANClusterer<IntCoord2> dbscan = new DBSCANClusterer<>(EPS, MIN_PTS);
@@ -111,7 +142,7 @@ public class MultiblockRadarLogic {
         });
     }
 
-    private int calculatePlayerPopulation(HashMap<IntCoord2, Object> objMap, List<IntCoord2> clusterPoints) {
+    private int calculatePlayerPopulation(Map<IntCoord2, Object> objMap, List<IntCoord2> clusterPoints) {
         int population = 0;
         for (IntCoord2 point : clusterPoints) {
             if (objMap.get(point) instanceof EntityPlayerMP) {
@@ -142,6 +173,20 @@ public class MultiblockRadarLogic {
     }
 
     public boolean isWorking() {
+        return false;
+    }
+
+    public boolean checkCanScan(){
+        //FIXME
+        return true;
+    }
+    public boolean dataSlotIsEmpty(){
+        //FIXME
+        return false;
+    }
+
+    public boolean dataSlotIsWritten(){
+        //FIXME
         return false;
     }
 
