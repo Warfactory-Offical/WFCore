@@ -58,7 +58,6 @@ public class MultiblockRadarLogic {
             if (isOnTEWhitelist(tileEntity)) entityPosMap.put(getCoordPair(tileEntity.getPos()), tileEntity);
         }
 
-
         return entityPosMap;
     }
 
@@ -104,7 +103,7 @@ public class MultiblockRadarLogic {
                 clusterDataList.add(new ClusterData(
                         clusterPoints,
                         clusterCenter,
-                        new Tuple<>(boundingBoxMin, boundingBoxMax),
+                        new BoundingBox(boundingBoxMin, boundingBoxMax),
                         playerPopulation
                 ));
             }
@@ -149,12 +148,10 @@ public class MultiblockRadarLogic {
     private class ClusterData {
         private final List<IntCoord2> coordinates;
         private final IntCoord2 centerPoint;
-        //Left –> Min, Right –> Max
-        private final Tuple<IntCoord2, IntCoord2> boundingBox;
+        private final BoundingBox boundingBox;
         private final int playerPopulation;
 
-        public ClusterData(List<IntCoord2> coordinates, IntCoord2 centerPoint, Tuple<IntCoord2, IntCoord2> boundingBox, int playerPopulation) {
-            //TODO: Stop using tuples, they are too generic
+        public ClusterData(List<IntCoord2> coordinates, IntCoord2 centerPoint, BoundingBox boundingBox, int playerPopulation) {
             this.coordinates = coordinates;
             this.centerPoint = centerPoint;
             this.boundingBox = boundingBox;
@@ -169,8 +166,30 @@ public class MultiblockRadarLogic {
             return centerPoint;
         }
 
-        public Tuple<IntCoord2, IntCoord2> getBoundingBox() {
+        public BoundingBox getBoundingBox() {
             return boundingBox;
+        }
+
+        public int getPlayerPopulation() {
+            return playerPopulation;
+        }
+    }
+
+    private class BoundingBox {
+        private final IntCoord2 min, max;
+
+        BoundingBox(IntCoord2 min, IntCoord2 max) {
+            this.min = min;
+            this.max = max;
+        }
+
+        public IntCoord2 getMin() {
+            return min;
+        }
+
+        public IntCoord2 getMax() {
+            return max;
         }
     }
 }
+
