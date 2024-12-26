@@ -15,11 +15,12 @@ import wfcore.math.BoundingBox;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
+import static wfcore.api.utils.RadarTeWhitelist.TE_WHITELIST;
+
 public class MultiblockRadarLogic {
     //TODO: Perhaps make those values adjustable?
     public static final int MIN_PTS = 15;
     public static final int EPS = 10;
-    private static final Set<Class<? extends TileEntity>> TE_WHITELIST = new HashSet<>();
 
     private int voltageTier;
     private int overclockAmount;
@@ -30,9 +31,6 @@ public class MultiblockRadarLogic {
     private boolean isFinished;
     private boolean isActive = false;
     private boolean isWorkingEnabled = true;
-    static {
-        //TODO: add any viable tileenttity from GT, AE2, WARFORGE and more
-    }
 
 
     public MultiblockRadarLogic(int voltageTier, int overclockAmount, int speed, gregtech.api.metatileentity.MetaTileEntity metaTileEntity) {
