@@ -64,8 +64,8 @@ public class MetaTileEntityRadar extends MultiblockWithDisplayBase implements IO
 
 
    /* RADAR cannot have any blocks surrounding its dish, it should raycast about 100 blocks from in each direction
-        y of the TE must be above sea level (may be removed though, ppl will cope about it enough)
-        to ensure its clean. It takes EV+ power (2 amps)
+        y of the TE must be above sea level (may be removed though, ppl will cope about its size already)
+        to ensure its surroundings are clean. It takes EV+ power (2 amps)
         it must have a GT cwp provided and have a dataslot, or be connected to data bank
         UI must allow for adjustment of minPts and eps (defaults are set already)
     */

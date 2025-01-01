@@ -107,12 +107,12 @@ public class MultiblockRadarLogic {
     }
 
     /*
-    Radar takes all loaded valid entites and players, uses clustering algorytym DBSCAN and finds
-    all clusters, which in this case are bases, are gregetech bases are dense with Tile entites
+    Radar takes all loaded valid entities and players, uses clustering algorithm DBSCAN and finds
+    all clusters, which in this case are bases.
     It finds a bounding box and center of the base, scans how many players are inside. This is
     to avoid possible ghost bases. (generally player and TE dense areas are bases). This  SHOULD
     be ran async and must be done before the simulated scan is done (default time: 2000 seconds),
-    values such as EPS and MIN_PTS should be ajustable in GUI by player.
+    values such as EPS and MIN_PTS should be adjustable in GUI by player.
      */
     private CompletableFuture<List<ClusterData>> calculateDBSCAN(Map<IntCoord2, Object> objMap) {
 
