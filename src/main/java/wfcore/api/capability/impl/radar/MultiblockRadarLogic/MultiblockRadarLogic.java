@@ -2,6 +2,7 @@ package wfcore.api.capability.impl.radar.MultiblockRadarLogic;
 
 import gregtech.api.metatileentity.MetaTileEntity;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
@@ -18,9 +19,9 @@ import java.util.concurrent.CompletableFuture;
 import static wfcore.api.utils.RadarTeWhitelist.TE_WHITELIST;
 
 public class MultiblockRadarLogic {
-    //TODO: Perhaps make those values adjustable?
-    public static final int MIN_PTS = 15;
-    public static final int EPS = 10;
+    //TODO: Make those values adjustable in GUI
+    public int MIN_PTS = 15;
+    public int EPS = 10;
 
     private int voltageTier;
     private int overclockAmount;
@@ -42,6 +43,19 @@ public class MultiblockRadarLogic {
 
     }
 
+   /* Scan should do as follows:
+   1. Make sure that its on server
+   2. make sure it can scan and is enabled, it should not activate on power on, player must trigger scan
+        in GUI by hand
+   3. make sure dataslot (custom TE that can only hold data item such as memory stick or orb) has empty valid data item (should work with data bank)
+   4. Grab snapshot of valid TEs and players (this ofc is done on server thread)
+   5. Run calculation
+   6. Put it on data stick so it can then be put into a printer (basically port of NH printer), for data to be put in a book
+    */
+    //Perhaps some visualization in the tablet?
+    //OPTIONAL: integrate Map mod with the mod, so players have bounding boxes drawn on their minimap, with all valid TEs  pointed out and waypoints to the centers
+
+
    public void performScan() {
        if (metaTileEntity.getWorld().isRemote)
            return;
@@ -56,6 +70,7 @@ public class MultiblockRadarLogic {
      if(!dataSlotIsEmpty() && !dataSlotIsWritten()){
                  //Get the snapshot of all loaded players TEs
         this.LoadedValidObjects  = this.collectValidEntites();
+        //Run dbscan
         calculateDBSCAN(LoadedValidObjects).thenAccept(clusterData -> {
             this.scanResults = clusterData;
         }).exceptionally(ex -> {
@@ -73,6 +88,7 @@ public class MultiblockRadarLogic {
         return new IntCoord2(pos);
     }
 
+    //Collect snapshot of all players and valid TEs
     private HashMap<IntCoord2, Object> collectValidEntites() {
         MinecraftServer serverInstance = FMLCommonHandler.instance().getMinecraftServerInstance();
         HashMap<IntCoord2, Object> entityPosMap = new HashMap<>();
@@ -91,8 +107,12 @@ public class MultiblockRadarLogic {
     }
 
     /*
-    Async method that is supposed to calculate all data relating to base data, by obtaining list of TEs, finding their
-    bounding boxes and centers.
+    Radar takes all loaded valid entites and players, uses clustering algorytym DBSCAN and finds
+    all clusters, which in this case are bases, are gregetech bases are dense with Tile entites
+    It finds a bounding box and center of the base, scans how many players are inside. This is
+    to avoid possible ghost bases. (generally player and TE dense areas are bases). This  SHOULD
+    be ran async and must be done before the simulated scan is done (default time: 2000 seconds),
+    values such as EPS and MIN_PTS should be ajustable in GUI by player.
      */
     private CompletableFuture<List<ClusterData>> calculateDBSCAN(Map<IntCoord2, Object> objMap) {
 
@@ -188,5 +208,16 @@ public class MultiblockRadarLogic {
         return false;
     }
 
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
+    }
+
+    public NBTTagCompound writeToNBT(NBTTagCompound data) {
+        //FIXME
+    }
 }
 

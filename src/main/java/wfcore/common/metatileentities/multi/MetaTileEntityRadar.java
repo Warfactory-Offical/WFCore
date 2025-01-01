@@ -3,9 +3,11 @@ package wfcore.common.metatileentities.multi;
 import codechicken.lib.render.CCRenderState;
 import codechicken.lib.render.pipeline.IVertexOperation;
 import codechicken.lib.vec.Matrix4;
+import com.google.common.collect.Lists;
 import gregtech.api.GTValues;
 import gregtech.api.capability.*;
 import gregtech.api.capability.impl.EnergyContainerList;
+import gregtech.api.metatileentity.IDataInfoProvider;
 import gregtech.api.metatileentity.MetaTileEntity;
 import gregtech.api.metatileentity.interfaces.IGregTechTileEntity;
 import gregtech.api.metatileentity.multiblock.IMultiblockPart;
@@ -13,6 +15,7 @@ import gregtech.api.metatileentity.multiblock.MultiblockAbility;
 import gregtech.api.metatileentity.multiblock.MultiblockWithDisplayBase;
 import gregtech.api.pattern.BlockPattern;
 import gregtech.api.pattern.FactoryBlockPattern;
+import gregtech.api.pattern.PatternMatchContext;
 import gregtech.api.unification.material.Materials;
 import gregtech.api.util.GTUtility;
 import gregtech.client.renderer.ICubeRenderer;
@@ -23,7 +26,10 @@ import gregtech.common.blocks.StoneVariantBlock;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagInt;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -36,10 +42,12 @@ import java.util.List;
 
 import static gregtech.api.util.RelativeDirection.*;
 
-public class MetaTileEntityRadar extends MultiblockWithDisplayBase implements IOpticalComputationReceiver, IControllable {
+public class MetaTileEntityRadar extends MultiblockWithDisplayBase implements IOpticalComputationReceiver, IControllable, IDataInfoProvider {
     private IEnergyContainer energyContainer;
     private IOpticalComputationProvider computationProvider;
     private IDataSlot dataSlot;
+    private int minPts = 15;
+    private int eps = 10;
     private int tier;
     //TODO: implement logic
     private final MultiblockRadarLogic radarLogic;
@@ -54,6 +62,13 @@ public class MetaTileEntityRadar extends MultiblockWithDisplayBase implements IO
         return isStructureFormed();
     }
 
+
+   /* RADAR cannot have any blocks surrounding its dish, it should raycast about 100 blocks from in each direction
+        y of the TE must be above sea level (may be removed though, ppl will cope about it enough)
+        to ensure its clean. It takes EV+ power (2 amps)
+        it must have a GT cwp provided and have a dataslot, or be connected to data bank
+        UI must allow for adjustment of minPts and eps (defaults are set already)
+    */
 
     @Override
     protected void updateFormedValid() {
@@ -82,7 +97,6 @@ public class MetaTileEntityRadar extends MultiblockWithDisplayBase implements IO
         this.radarLogic.setVoltageTier(GTUtility.getTierByVoltage(this.energyContainer.getInputVoltage()));
         this.radarLogic.setOverclockAmount(
                 Math.max(1, GTUtility.getTierByVoltage(this.energyContainer.getInputVoltage()) - this.tier));
-        this.radarLogic.initPos(getPos(), this.radarLogic.getCurrentRadius());
     }
 
     public boolean drainEnergy(boolean simulate) {
@@ -102,6 +116,8 @@ public class MetaTileEntityRadar extends MultiblockWithDisplayBase implements IO
     }
 
 
+
+    //FIXME: wrong block IDs in some places (also may be too big, but thats for later to fix)
     protected @NotNull BlockPattern createStructurePattern() {
 
         return FactoryBlockPattern.start(RIGHT, FRONT, UP)
@@ -170,6 +186,23 @@ public class MetaTileEntityRadar extends MultiblockWithDisplayBase implements IO
         this.radarLogic.getSpeed();
     }
 
+    public void invalidateStructure() {
+        super.invalidateStructure();
+        resetTileAbilities();
+        if (this.radarLogic.isActive())
+            this.radarLogic.setActive(false);
+    }
+
+    @Override
+    protected void formStructure(PatternMatchContext context) {
+        super.formStructure(context);
+        initializeAbilities();
+    }
+
+    private void resetTileAbilities() {
+        this.energyContainer = new EnergyContainerList(Lists.newArrayList());
+    }
+
 
     @Override
     public boolean isWorkingEnabled() {
@@ -190,6 +223,22 @@ public class MetaTileEntityRadar extends MultiblockWithDisplayBase implements IO
     }
 
     @Override
+    public NBTTagCompound writeToNBT(NBTTagCompound data) {
+        super.writeToNBT(data);
+        data.setTag("minPts", new NBTTagInt(minPts));
+        data.setTag("eps", new NBTTagInt(eps));
+        return this.radarLogic.writeToNBT(data);
+    }
+
+    @Override
+    public void readFromNBT(NBTTagCompound data) {
+        super.readFromNBT(data);
+        chunkMode = data.getInteger("chunkMode") != 0;
+        silkTouch = data.getInteger("silkTouch") != 0;
+        this.minerLogic.readFromNBT(data);
+    }
+
+    @Override
     public IOpticalComputationProvider getComputationProvider() {
         return null;
     }
@@ -201,5 +250,10 @@ public class MetaTileEntityRadar extends MultiblockWithDisplayBase implements IO
     @Override
     public boolean allowsExtendedFacing() {
         return false;
+    }
+
+    @Override
+    public @NotNull List<ITextComponent> getDataInfo() {
+        return List.of();
     }
 }
