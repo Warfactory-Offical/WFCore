@@ -49,7 +49,6 @@ dependencies {
     implementation rfg.deobf("curse.maven:ae2-extended-life-570458:4402048")
 
     implementation rfg.deobf("curse.maven:ctm-267602:2915363") // CTM 1.0.2.31
-    implementation rfg.deobf("curse.maven:Avaritia-261348:3143349")
     api("com.cleanroommc:modularui:2.4.3")
 
 //    implementation rfg.deobf("curse.maven:groovyscript-687577:4991701") // GRS 0.7.3

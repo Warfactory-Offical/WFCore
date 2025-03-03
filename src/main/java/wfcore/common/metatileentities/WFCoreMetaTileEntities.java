@@ -18,15 +18,14 @@ import static gregtech.common.metatileentities.MetaTileEntities.*;
 public class WFCoreMetaTileEntities {
 
     public static MetaTileEntityProjector PROJECTOR;
-    public static MetaTileEntitySteamWiremill STEAMWIREMILL;
+
     public static MetaTileEntityBoilerTower BOILERTOWER;
     public static SteamPCBFactory STEAM_PCB_FACTORY_STEEL;
     public static MetaTileEntityWarfactoryBlastFurnace LARGEBLASTFURNACE;
     public static MetaTileEntityStrandCaster STRANDCASTER;
 
 
-
-    public static int id = 0;
+    public static int id = 10000;
 
     public static void init() {
         //Multis
@@ -34,9 +33,8 @@ public class WFCoreMetaTileEntities {
         BOILERTOWER = registerMetaTileEntity(id++, new MetaTileEntityBoilerTower(location("boilertower")));
         LARGEBLASTFURNACE = registerMetaTileEntity(id++, new MetaTileEntityWarfactoryBlastFurnace(location("largeblastfurnace")));
         STRANDCASTER = registerMetaTileEntity(id++, new MetaTileEntityStrandCaster(location("strandcaster")));
-
         GTLog.logger.info("Who the fuck reads these lmaoooo");
-        STEAM_PCB_FACTORY_STEEL = registerMetaTileEntity(16000,
+        STEAM_PCB_FACTORY_STEEL = registerMetaTileEntity(id++,
                 new SteamPCBFactory(gregtechId("steam_pcb_factory"), true));
     }
 
