@@ -46,8 +46,6 @@ import java.util.List;
 import static gregtech.api.util.RelativeDirection.*;
 import static wfcore.api.recipes.WFCoreRecipeMaps.PROJECTOR_RECIPES;
 
-
-
 public class MetaTileEntityProjector extends RecipeMapMultiblockController implements IFastRenderMetaTileEntity, IBloomEffect {
     public MetaTileEntityProjector(ResourceLocation metaTileEntityId) {
         super(metaTileEntityId, PROJECTOR_RECIPES);

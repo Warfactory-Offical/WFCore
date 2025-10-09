@@ -9,6 +9,7 @@ import gregtech.api.GTValues;
 import gregtech.api.unification.Elements;
 import gregtech.api.fluids.FluidBuilder;
 import gregtech.api.unification.material.properties.BlastProperty.GasTier;
+import wfcore.api.material.info.WFCoreMaterialFlags;
 
 import static gregtech.api.GTValues.*;
 import static gregtech.api.unification.material.Materials.*;
@@ -46,7 +47,7 @@ public class HbmMaterials {
                 .liquid(new FluidBuilder().temperature(1373))
                 .iconSet(METALLIC)
                 .flags(STD_METAL, GENERATE_LONG_ROD, GENERATE_FINE_WIRE, GENERATE_SPRING, GENERATE_FOIL, GENERATE_FRAME,
-                        GENERATE_DOUBLE_PLATE)
+                        GENERATE_DOUBLE_PLATE, WFCoreMaterialFlags.GENERATE_NTMPIPE)
                 .fluidPipeProperties(1200, 40, true)
                 .blast(b -> b.temp(2700, GasTier.LOW).blastStats(VA[HV], 200))
                 .build();
@@ -85,16 +86,6 @@ public class HbmMaterials {
                 .build();
         Astatine.setProperty(PropertyKey.DUST, new DustProperty());
         Astatine.setProperty(PropertyKey.INGOT, new IngotProperty());
-        Neoveline = new Material.Builder(id++, gregtechId("Neoveline"))
-                .cableProperties(GTValues.V[GTValues.MV], 4, 0, true)
-                .color(0x49FD13).ingot()
-                .liquid(new FluidBuilder().temperature(1373))
-                .iconSet(METALLIC)
-                .flags(STD_METAL, GENERATE_LONG_ROD, GENERATE_FINE_WIRE, GENERATE_SPRING, GENERATE_FOIL, GENERATE_FRAME,
-                        GENERATE_DOUBLE_PLATE)
-                .fluidPipeProperties(1200, 40, true)
-                .blast(b -> b.temp(2700, GasTier.LOW).blastStats(VA[HV], 200))
-                .build();
         Verticium = new Material.Builder(id++, gregtechId("Verticium"))
                 .cableProperties(GTValues.V[GTValues.MV], 4, 0, true)
                 .color(0x29AE01).ingot()

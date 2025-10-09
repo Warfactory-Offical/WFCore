@@ -26,7 +26,15 @@ gregtech.material.unobtainium.tooltip=Atm referance:interrobang:
 gregtech.material.c_m_b_steel=CMB Steel
 gregtech.material.schrabidium=Schrabidium
 gregtech.material.australium=Australium
-gregtech.material.neoveline=Neoveline
 gregtech.material.verticium=Verticium
 
 gregtech.machine.boiler_tower.height=Stack Height: %s §9blocks
+
+# Ore Prefixes
+
+item.material.oreprefix.billet=%s Billet
+item.material.oreprefix.ntmpipe=%s Pipe
+item.material.oreprefix.wiredense=%s Dense Wire
+item.material.oreprefix.shell=%s Shell
+item.material.oreprefix.plateTriple=Cast %s Plate
+item.material.oreprefix.plateSextuple=Welded %s Plate

@@ -1,14 +1,16 @@
 package wfcore.common.metatileentities.multi.primitive;
 
-import codechicken.lib.render.CCRenderState;
-import codechicken.lib.render.pipeline.IVertexOperation;
-import codechicken.lib.texture.TextureUtils;
-import codechicken.lib.vec.Cuboid6;
-import codechicken.lib.vec.Matrix4;
 import gregtech.api.GTValues;
+import gregtech.api.capability.impl.EnergyContainerList;
 import gregtech.api.capability.impl.FluidTankList;
 import gregtech.api.capability.impl.ItemHandlerList;
+import gregtech.api.capability.impl.SteamMultiWorkable;
+import gregtech.api.gui.GuiTextures;
 import gregtech.api.gui.ModularUI;
+import gregtech.api.gui.widgets.LabelWidget;
+import gregtech.api.gui.widgets.ProgressWidget;
+import gregtech.api.gui.widgets.RecipeProgressWidget;
+import gregtech.api.gui.widgets.SlotWidget;
 import gregtech.api.items.itemhandlers.GTItemStackHandler;
 import gregtech.api.metatileentity.MetaTileEntity;
 import gregtech.api.metatileentity.interfaces.IGregTechTileEntity;
@@ -19,6 +21,7 @@ import gregtech.api.pattern.BlockPattern;
 import gregtech.api.pattern.FactoryBlockPattern;
 import gregtech.api.pattern.PatternMatchContext;
 import gregtech.api.pattern.TraceabilityPredicate;
+import gregtech.api.recipes.RecipeMaps;
 import gregtech.api.util.GTUtility;
 import gregtech.client.particle.VanillaParticleEffects;
 import gregtech.client.renderer.CubeRendererState;
@@ -27,10 +30,13 @@ import gregtech.client.renderer.cclop.ColourOperation;
 import gregtech.client.renderer.cclop.LightMapOperation;
 import gregtech.client.renderer.texture.Textures;
 import gregtech.client.utils.BloomEffectUtil;
+import gregtech.client.utils.TooltipHelper;
 import gregtech.common.ConfigHolder;
 import gregtech.common.blocks.BlockMetalCasing;
 import gregtech.common.blocks.MetaBlocks;
+
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.SoundEvents;
@@ -41,15 +47,28 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
+import codechicken.lib.render.CCRenderState;
+import codechicken.lib.render.pipeline.IVertexOperation;
+import codechicken.lib.texture.TextureUtils;
+import codechicken.lib.vec.Cuboid6;
+import codechicken.lib.vec.Matrix4;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.spongepowered.include.com.google.common.collect.Lists;
 import wfcore.api.recipes.WFCoreRecipeMaps;
 
 import java.util.List;
 
-
 public class MetaTileEntityWarfactoryBlastFurnace extends RecipeMapPrimitiveMultiblockController {
+
+    private void resetTileAbilities() {
+        this.inputInventory = new GTItemStackHandler(this, 0);
+        this.inputFluidInventory = new FluidTankList(true);
+        this.outputInventory = new GTItemStackHandler(this, 0);
+        this.outputFluidInventory = new FluidTankList(true);
+    }
 
     private static final TraceabilityPredicate SNOW_PREDICATE = new TraceabilityPredicate(
             bws -> GTUtility.isBlockSnow(bws.getBlockState()));
@@ -57,27 +76,17 @@ public class MetaTileEntityWarfactoryBlastFurnace extends RecipeMapPrimitiveMult
     public MetaTileEntityWarfactoryBlastFurnace(ResourceLocation metaTileEntityId) {
         super(metaTileEntityId, WFCoreRecipeMaps.Large_Blast_Furnace);
     }
-
-    private void resetTileAbilities() {
-        this.importItems = new GTItemStackHandler(this, 0);
-        this.importFluids = new FluidTankList(true);
-        this.exportItems = new GTItemStackHandler(this, 0);
-        this.exportFluids =   new FluidTankList(true);
-    }
-
     @Override
     protected void initializeAbilities() {
-        this.importItems = new ItemHandlerList(getAbilities((MultiblockAbility.IMPORT_ITEMS)));
-        this.exportItems = new ItemHandlerList(getAbilities((MultiblockAbility.EXPORT_ITEMS)));
-        this.exportFluids = new FluidTankList(true, getAbilities(MultiblockAbility.EXPORT_FLUIDS));
+        this.inputInventory = new ItemHandlerList(getAbilities((MultiblockAbility.IMPORT_ITEMS)));
+        this.outputInventory = new ItemHandlerList(getAbilities((MultiblockAbility.EXPORT_ITEMS)));
+        this.outputFluidInventory = new FluidTankList(true, getAbilities(MultiblockAbility.EXPORT_FLUIDS));
     }
-
     @Override
     protected void formStructure(PatternMatchContext context) {
         super.formStructure(context);
         this.initializeAbilities();
     }
-
     @Override
     public MetaTileEntity createMetaTileEntity(IGregTechTileEntity tileEntity) {
         return new MetaTileEntityWarfactoryBlastFurnace(metaTileEntityId);
@@ -98,7 +107,7 @@ public class MetaTileEntityWarfactoryBlastFurnace extends RecipeMapPrimitiveMult
                         .or(abilities(MultiblockAbility.EXPORT_FLUIDS)))
                 .where('#', air())
                 .where('&', air().or(SNOW_PREDICATE)) // this won't stay in the structure, and will be broken while
-                // running
+                                                      // running
                 .where('Y', selfPredicate())
                 .build();
     }

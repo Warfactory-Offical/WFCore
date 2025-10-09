@@ -44,9 +44,9 @@ public class SteamPCBFactory extends InsaneSteamMetaTileEntity {
     public ModularUI createUI(EntityPlayer player) {
         return createUITemplate(player)
                 .slot(this.importItems, 0, 53, 25, GuiTextures.SLOT_STEAM.get(isInsanePressure),
-                        GuiTextures.FURNACE_OVERLAY_STEAM.get(isInsanePressure))
+                        GuiTextures.SLOT_STEAM.get(isInsanePressure))
                 .slot(this.importItems, 1, 35, 25, GuiTextures.SLOT_STEAM.get(isInsanePressure),
-                        GuiTextures.FURNACE_OVERLAY_STEAM.get(isInsanePressure))
+                        GuiTextures.SLOT_STEAM.get(isInsanePressure))
                 .progressBar(workableHandler::getProgressPercent, 79, 26, 20, 16,
                         GuiTextures.PROGRESS_BAR_ARROW_STEAM.get(isInsanePressure), MoveType.HORIZONTAL,
                         workableHandler.getRecipeMap())

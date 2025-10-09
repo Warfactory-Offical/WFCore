@@ -3,7 +3,6 @@ package wfcore;
 import gregtech.api.GregTechAPI;
 import gregtech.api.unification.material.event.MaterialEvent;
 import gregtech.core.unification.material.internal.MaterialRegistryManager;
-import li.cil.oc.api.Driver;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.crafting.IRecipe;
@@ -20,14 +19,10 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
-import wfcore.common.OCDrivers.DriverRadar;
 import wfcore.common.materials.WFCoreMaterials;
 import wfcore.common.metatileentities.WFCoreMetaTileEntities;
 import wfcore.common.proxy.CommonProxy;
-import wfcore.common.radarActivity.RadarActivity;
 import wfcore.common.recipe.chain.*;
-
-import java.util.concurrent.ConcurrentHashMap;
 
 @Mod(modid = Tags.MODID, version = Tags.VERSION, name = Tags.MODNAME, acceptedMinecraftVersions = "[1.12.2]")
 public class WFCore {
@@ -75,12 +70,9 @@ public class WFCore {
     public void init(FMLInitializationEvent event) {
     }
 
-    public static final ConcurrentHashMap<Integer, RadarActivity> dimensionWiseRadar = new ConcurrentHashMap<>(16); // stores
-
     @EventHandler
     // postInit "Handle interaction with other mods, complete your setup based on this." (Remove if not needed)
     public void postInit(FMLPostInitializationEvent event) {
-        Driver.add(new DriverRadar());
     }
 
     @EventHandler

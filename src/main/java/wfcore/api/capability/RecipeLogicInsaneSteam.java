@@ -29,7 +29,7 @@ import net.minecraft.world.WorldServer;
 import net.minecraftforge.fluids.IFluidTank;
 
 import org.jetbrains.annotations.NotNull;
-/*
+
 public class RecipeLogicInsaneSteam extends AbstractRecipeLogic implements IVentable {
 
     private final IFluidTank steamFluidTank;
@@ -264,4 +264,3 @@ public class RecipeLogicInsaneSteam extends AbstractRecipeLogic implements IVent
         this.ventingStuck = compound.getBoolean("VentingStuck");
     }
 }
-*/

@@ -54,10 +54,10 @@ import java.util.List;
 public class MetaTileEntityStrandCaster extends RecipeMapPrimitiveMultiblockController {
 
     private void resetTileAbilities() {
-        this.importItems = new GTItemStackHandler(this, 0);
-        this.importFluids = new FluidTankList(true);
-        this.exportItems = new GTItemStackHandler(this, 0);
-        this.exportFluids = new FluidTankList(true);
+        this.inputInventory = new GTItemStackHandler(this, 0);
+        this.inputFluidInventory = new FluidTankList(true);
+        this.outputInventory = new GTItemStackHandler(this, 0);
+        this.outputFluidInventory = new FluidTankList(true);
     }
 
     private static final TraceabilityPredicate SNOW_PREDICATE = new TraceabilityPredicate(
@@ -68,10 +68,10 @@ public class MetaTileEntityStrandCaster extends RecipeMapPrimitiveMultiblockCont
     }
     @Override
     protected void initializeAbilities() {
-        this.importItems = new ItemHandlerList(getAbilities((MultiblockAbility.IMPORT_ITEMS)));
-        this.exportItems = new ItemHandlerList(getAbilities((MultiblockAbility.EXPORT_ITEMS)));
-        this.importFluids = new FluidTankList(true, getAbilities(MultiblockAbility.IMPORT_FLUIDS));
-        this.exportFluids = new FluidTankList(true, getAbilities(MultiblockAbility.EXPORT_FLUIDS));
+        this.inputInventory = new ItemHandlerList(getAbilities((MultiblockAbility.IMPORT_ITEMS)));
+        this.outputInventory = new ItemHandlerList(getAbilities((MultiblockAbility.EXPORT_ITEMS)));
+        this.inputFluidInventory = new FluidTankList(true, getAbilities(MultiblockAbility.IMPORT_FLUIDS));
+        this.outputFluidInventory = new FluidTankList(true, getAbilities(MultiblockAbility.EXPORT_FLUIDS));
     }
     @Override
     protected void formStructure(PatternMatchContext context) {
