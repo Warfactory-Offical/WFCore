@@ -52,6 +52,7 @@ dependencies {
 
     // AE2UEL 0.55.6 (transitive gt dep)
     implementation rfg.deobf("curse.maven:ae2-extended-life-570458:4402048")
+    implementation rfg.deobf("curse.maven:iguanatweaks-reborn-285690:3283799")
 
     implementation rfg.deobf("curse.maven:ctm-267602:2915363") // CTM 1.0.2.31
     implementation rfg.deobf("curse.maven:Avaritia-261348:3143349")
