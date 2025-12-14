@@ -2,24 +2,21 @@
   {
     "modid": "${modid}",
     "name": "${modname}",
-    "description": "The coremod for the §mWarFactory§r §6§lTrainvoi§r Project",
+    "description": "The coremod for the §mWarFactory 2§r  Project",
     "version": "${version}",
     "mcversion": "${mcversion}",
     "logoFile": "",
     "url": "",
     "authorList": [
-      "§l§9Lewis§r",
-      "§o§n§4Gloo§r",
-      "§6§lTrainvoi§r",
-      "Ward",
-      "Polybenzimidazole",
-      "§mMeliodas§r",
-      "§kBioHacks§r",
-      "Orbital Nebula"
+      "MrNorwood",
+      "EightXor8"
+
     ],
-    "credits": "Thanks to §6§lTrainvoi§r for being integral to the development of this Project",
+    "credits": "Pepsi CO for fueling me",
     "dependencies": [
-      "gregtech"
+      "gregtech",
+      "mcheli",
+      "hbm"
     ]
   }
 ]
