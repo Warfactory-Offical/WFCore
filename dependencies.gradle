@@ -39,17 +39,17 @@
  */
 dependencies {
 
-    devOnlyNonPublishable(rfg.deobf(project.files("libs/gregtech-1.12.2-2.8.11-beta-dev.jar"))) // GTCEu 2.9.0
-    devOnlyNonPublishable(rfg.deobf(project.files("libs/GregicalityMultiblocks-1.3-dev.jar"))) //GCYM 1.3
-
-    // CCL 3.2.3.358
+    implementation rfg.deobf("curse.maven:gregtech-ce-unofficial-557242:5519022")
     implementation rfg.deobf('curse.maven:codechicken-lib-1-8-242818:2779848')
-
-    // AE2UEL 0.55.6 (transitive gt dep)
     implementation rfg.deobf("curse.maven:ae2-extended-life-570458:4402048")
 
-    implementation rfg.deobf("curse.maven:ctm-267602:2915363") // CTM 1.0.2.31
-    api("com.cleanroommc:modularui:2.4.3")
+
+    //WF mods
+    implementation rfg.deobf("curse.maven:hbm-nuclear-tech-mod-community-edition-1312314:7214852")
+    implementation rfg.deobf("curse.maven:mchce-1383222:7241614")
+
+    implementation rfg.deobf("curse.maven:ctm-267602:2915363")
+    api("com.cleanroommc:modularui:3.0.5")
 
 //    implementation rfg.deobf("curse.maven:groovyscript-687577:4991701") // GRS 0.7.3
 

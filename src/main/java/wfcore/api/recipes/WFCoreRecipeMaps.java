@@ -1,18 +1,10 @@
 package wfcore.api.recipes;
-import gregtech.api.GTValues;
+
 import gregtech.api.gui.GuiTextures;
-import gregtech.api.gui.widgets.ProgressWidget;
-import gregtech.api.gui.widgets.ProgressWidget.MoveType;
 import gregtech.api.recipes.RecipeMap;
 import gregtech.api.recipes.RecipeMapBuilder;
-import gregtech.api.recipes.builders.ComputationRecipeBuilder;
-import gregtech.api.recipes.builders.FuelRecipeBuilder;
 import gregtech.api.recipes.builders.PrimitiveRecipeBuilder;
 import gregtech.api.recipes.builders.SimpleRecipeBuilder;
-import gregtech.core.sound.GTSoundEvents;
-import net.minecraft.init.SoundEvents;
-
-import static gregtech.api.recipes.RecipeMaps.*;
 
 public class WFCoreRecipeMaps {
 
