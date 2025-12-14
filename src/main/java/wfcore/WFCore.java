@@ -1,5 +1,6 @@
 package wfcore;
 
+import gregtech.api.unification.material.event.MaterialEvent;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.crafting.IRecipe;
@@ -26,9 +27,6 @@ public class WFCore {
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
         MinecraftForge.EVENT_BUS.register(this);
-//        LOGGER.info("I am " + Tags.MODNAME + " + at version " + Tags.VERSION);
-//        MaterialEvent materialEvent = new MaterialEvent();
-
     }
 
 

@@ -39,10 +39,13 @@
  */
 dependencies {
 
+    annotationProcessor "org.projectlombok:lombok:1.18.42"
+
     implementation 'codechicken:codechickenlib:3.2.3.358' transitive false
     implementation 'gregtech:gregtech:2.8.10-beta' transitive false
     implementation 'gregicality:GregicalityMultiblocks:1.2.11' transitive false
     api "com.cleanroommc:modularui:3.0.5" transitive false
+    shadowImplementation  group: 'org.apache.commons', name: 'commons-math3', version: '3.6.1'
 
 
     //WF mods

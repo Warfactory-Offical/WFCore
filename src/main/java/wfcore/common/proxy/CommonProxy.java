@@ -33,15 +33,7 @@ public class CommonProxy {
 
     @SubscribeEvent
     public static void registerItems(@NotNull RegistryEvent.Register<Item> event) {
-        IForgeRegistry<Item> registry = event.getRegistry();
-
-
     }
-
-//    @SubscribeEvent
-//    public static void registerMTERegistry(MTEManager.MTERegistryEvent event) {
-//        GregTechAPI.MTE_REGISTRY.createRegistry(Tags.MODID);
-//    }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     public static void registerMaterials(@NotNull MaterialEvent event) {
