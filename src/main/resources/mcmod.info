@@ -1,4 +1,5 @@
-[{
+[
+  {
     "modid": "${modid}",
     "name": "${modname}",
     "description": "The coremod for the §mWarFactory§r §6§lTrainvoi§r Project",
@@ -6,9 +7,19 @@
     "mcversion": "${mcversion}",
     "logoFile": "",
     "url": "",
-    "authorList": ["§l§9Lewis§r", "§o§n§4Gloo§r", "§6§lTrainvoi§r", "Ward", "Polybenzimidazole", "§mMeliodas§r", "§kBioHacks§r", "Orbital Nebula"],
+    "authorList": [
+      "§l§9Lewis§r",
+      "§o§n§4Gloo§r",
+      "§6§lTrainvoi§r",
+      "Ward",
+      "Polybenzimidazole",
+      "§mMeliodas§r",
+      "§kBioHacks§r",
+      "Orbital Nebula"
+    ],
     "credits": "Thanks to §6§lTrainvoi§r for being integral to the development of this Project",
     "dependencies": [
-        "gregtech"
+      "gregtech"
     ]
-}]
+  }
+]

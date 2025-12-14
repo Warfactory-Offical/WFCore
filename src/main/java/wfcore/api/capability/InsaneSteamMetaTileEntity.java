@@ -1,5 +1,10 @@
 package wfcore.api.capability;
 
+import codechicken.lib.raytracer.CuboidRayTraceResult;
+import codechicken.lib.render.CCRenderState;
+import codechicken.lib.render.pipeline.ColourMultiplier;
+import codechicken.lib.render.pipeline.IVertexOperation;
+import codechicken.lib.vec.Matrix4;
 import gregtech.api.GTValues;
 import gregtech.api.capability.impl.CommonFluidFilters;
 import gregtech.api.capability.impl.FilteredFluidHandler;
@@ -17,7 +22,6 @@ import gregtech.client.renderer.texture.Textures;
 import gregtech.client.renderer.texture.cube.SimpleSidedCubeRenderer;
 import gregtech.client.utils.RenderUtil;
 import gregtech.common.ConfigHolder;
-
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
@@ -29,12 +33,6 @@ import net.minecraft.world.World;
 import net.minecraftforge.fluids.FluidTank;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-
-import codechicken.lib.raytracer.CuboidRayTraceResult;
-import codechicken.lib.render.CCRenderState;
-import codechicken.lib.render.pipeline.ColourMultiplier;
-import codechicken.lib.render.pipeline.IVertexOperation;
-import codechicken.lib.vec.Matrix4;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.ApiStatus;
@@ -158,7 +156,9 @@ public abstract class InsaneSteamMetaTileEntity extends MetaTileEntity {
         }
     }
 
-    /** @deprecated No longer used, look at {@link VanillaParticleEffects#defaultFrontEffect} to see old logic. */
+    /**
+     * @deprecated No longer used, look at {@link VanillaParticleEffects#defaultFrontEffect} to see old logic.
+     */
     @Deprecated
     @ApiStatus.ScheduledForRemoval(inVersion = "2.9")
     @SideOnly(Side.CLIENT)

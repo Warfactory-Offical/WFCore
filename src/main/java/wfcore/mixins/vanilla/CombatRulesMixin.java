@@ -1,6 +1,5 @@
 package wfcore.mixins.vanilla;
 
-import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import net.minecraft.util.CombatRules;
 import net.minecraft.util.math.MathHelper;
 import org.spongepowered.asm.mixin.Mixin;
@@ -24,7 +23,7 @@ public abstract class CombatRulesMixin {
     // here I just copied over the entire method, hope it won't cause issues.
     //@ModifyReturnValue(method = "getDamageAfterAbsorb", at = @At(value = "RETURN"))
     @Inject(method = "getDamageAfterAbsorb(FFF)F", at = @At("RETURN"), cancellable = true, locals = CAPTURE_FAILSOFT)
-private static void getDamageAfterAbsorb(float damage, float totalArmor, float toughnessAttribute, CallbackInfoReturnable<Float> ci, float f) {
+    private static void getDamageAfterAbsorb(float damage, float totalArmor, float toughnessAttribute, CallbackInfoReturnable<Float> ci, float f) {
         //float f = 2.0F + toughnessAttribute / 4.0F;
         float f1 = MathHelper.clamp(totalArmor - damage / f, totalArmor * 0.2F, 25.0F);
         ci.setReturnValue(damage * (1.0F - f1 / 25.0F));

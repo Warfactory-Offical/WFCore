@@ -1,23 +1,21 @@
 package wfcore.common.materials;
 
+import gregtech.api.GTValues;
+import gregtech.api.fluids.FluidBuilder;
 import gregtech.api.unification.material.Material;
+import gregtech.api.unification.material.properties.BlastProperty.GasTier;
 import gregtech.api.unification.material.properties.DustProperty;
-import gregtech.api.unification.material.properties.FluidPipeProperties;
 import gregtech.api.unification.material.properties.IngotProperty;
 import gregtech.api.unification.material.properties.PropertyKey;
-import gregtech.api.GTValues;
-import gregtech.api.unification.Elements;
-import gregtech.api.fluids.FluidBuilder;
-import gregtech.api.unification.material.properties.BlastProperty.GasTier;
 import wfcore.api.material.info.WFCoreMaterialFlags;
 
 import static gregtech.api.GTValues.*;
 import static gregtech.api.unification.material.Materials.*;
 import static gregtech.api.unification.material.info.MaterialFlags.*;
-import static gregtech.api.unification.material.info.MaterialIconSet.*;
+import static gregtech.api.unification.material.info.MaterialIconSet.METALLIC;
 import static gregtech.api.util.GTUtility.gregtechId;
-import static gregtech.api.GTValues.MV;
 import static wfcore.common.materials.WFCoreMaterials.*;
+
 public class HbmMaterials {
     public static void register() {
         int id = 800;

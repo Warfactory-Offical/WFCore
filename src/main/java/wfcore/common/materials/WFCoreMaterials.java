@@ -1,17 +1,19 @@
 package wfcore.common.materials;
 
-import gregtech.api.unification.material.MarkerMaterials;
 import gregtech.api.unification.material.Material;
-import gregtech.api.unification.material.Materials;
-import gregtech.api.unification.material.materials.*;
-import gregtech.api.unification.ore.OrePrefix;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class WFCoreMaterials {
     private static final AtomicBoolean INIT = new AtomicBoolean(false);
-
-
+    public static Material AdvancedAlloy;
+    public static Material Desh;
+    public static Material Australium;
+    public static Material Schrabidium;
+    public static Material Unobtainium;
+    public static Material CMBSteel;
+    public static Material Neoveline;
+    public static Material Verticium;
 
     public static void register() {
         if (INIT.getAndSet(true)) {
@@ -41,16 +43,6 @@ public class WFCoreMaterials {
          * - Reserved for CraftTweaker: 32000-32767
          */
 
-        ;
-
     }
-    public static Material AdvancedAlloy;
-    public static Material Desh;
-    public static Material Australium;
-    public static Material Schrabidium;
-    public static Material Unobtainium;
-    public static Material CMBSteel;
-    public static Material Neoveline;
-    public static Material Verticium;
 
 }

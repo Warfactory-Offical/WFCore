@@ -7,8 +7,6 @@ import gregtech.loaders.recipe.handlers.RecyclingRecipeHandler;
 public class WFCoreRecipeHandler {
 
 
-
-
     public static void init() {
         WFCoreOrePrefix.ntmpipe.addProcessingHandler(PropertyKey.DUST, RecyclingRecipeHandler::processCrushing);
         WFCoreOrePrefix.plateTriple.addProcessingHandler(PropertyKey.DUST, RecyclingRecipeHandler::processCrushing);

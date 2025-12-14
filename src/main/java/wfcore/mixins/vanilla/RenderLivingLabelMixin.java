@@ -12,13 +12,14 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 public class RenderLivingLabelMixin<T extends Entity> {
     @Shadow
     protected RenderManager renderManager;
+
     @ModifyVariable(
             method = "renderLivingLabel(Lnet/minecraft/entity/Entity;Ljava/lang/String;DDDI)V",
             at = @At("STORE"),
             ordinal = 0
 
     )
-    private boolean flag(boolean flagSrc, T entityIn, String str, double x, double y, double z, int maxDistance){
+    private boolean flag(boolean flagSrc, T entityIn, String str, double x, double y, double z, int maxDistance) {
         return renderManager.pointedEntity == entityIn;
     }
 }

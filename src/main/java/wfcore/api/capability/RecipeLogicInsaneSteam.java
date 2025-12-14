@@ -11,7 +11,6 @@ import gregtech.api.recipes.RecipeMap;
 import gregtech.api.util.GTUtility;
 import gregtech.common.ConfigHolder;
 import gregtech.core.advancement.AdvancementTriggers;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
@@ -27,7 +26,6 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.fluids.IFluidTank;
-
 import org.jetbrains.annotations.NotNull;
 
 public class RecipeLogicInsaneSteam extends AbstractRecipeLogic implements IVentable {
@@ -42,7 +40,7 @@ public class RecipeLogicInsaneSteam extends AbstractRecipeLogic implements IVent
     private EnumFacing ventingSide;
 
     public RecipeLogicInsaneSteam(MetaTileEntity tileEntity, RecipeMap<?> recipeMap, boolean isInsanePressure,
-                            IFluidTank steamFluidTank, double conversionRate) {
+                                  IFluidTank steamFluidTank, double conversionRate) {
         super(tileEntity, recipeMap);
         this.steamFluidTank = steamFluidTank;
         this.conversionRate = conversionRate;
@@ -54,28 +52,17 @@ public class RecipeLogicInsaneSteam extends AbstractRecipeLogic implements IVent
         return needsVenting && ventingStuck;
     }
 
-    @Override
-    public boolean isNeedsVenting() {
-        return needsVenting;
-    }
-
-    @Override
-    public void onFrontFacingSet(EnumFacing newFrontFacing) {
-        if (ventingSide == null) {
-            setVentingSide(newFrontFacing.getOpposite());
-        }
-    }
-
-    public EnumFacing getVentingSide() {
-        return ventingSide == null ? EnumFacing.SOUTH : ventingSide;
-    }
-
     public void setVentingStuck(boolean ventingStuck) {
         this.ventingStuck = ventingStuck;
         if (!metaTileEntity.getWorld().isRemote) {
             metaTileEntity.markDirty();
             writeCustomData(GregtechDataCodes.VENTING_STUCK, buf -> buf.writeBoolean(ventingStuck));
         }
+    }
+
+    @Override
+    public boolean isNeedsVenting() {
+        return needsVenting;
     }
 
     @Override
@@ -87,6 +74,17 @@ public class RecipeLogicInsaneSteam extends AbstractRecipeLogic implements IVent
             metaTileEntity.markDirty();
             writeCustomData(GregtechDataCodes.NEEDS_VENTING, buf -> buf.writeBoolean(needsVenting));
         }
+    }
+
+    @Override
+    public void onFrontFacingSet(EnumFacing newFrontFacing) {
+        if (ventingSide == null) {
+            setVentingSide(newFrontFacing.getOpposite());
+        }
+    }
+
+    public EnumFacing getVentingSide() {
+        return ventingSide == null ? EnumFacing.SOUTH : ventingSide;
     }
 
     public void setVentingSide(EnumFacing ventingSide) {

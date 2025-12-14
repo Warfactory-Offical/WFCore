@@ -2,8 +2,6 @@ package wfcore.common;
 
 
 import gregtech.api.unification.material.event.PostMaterialEvent;
-import gregtech.api.unification.material.properties.PropertyKey;
-import gregtech.api.unification.ore.OrePrefix;
 import gregtech.common.items.MetaItems;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraftforge.event.RegistryEvent;
@@ -28,13 +26,12 @@ public class EventHandlers {
     }
 
 
-
-        @SubscribeEvent
-        public static void registerRecipes(RegistryEvent.Register<IRecipe> event) {
-            // Initialize recipe handlers
-            WFCoreRecipeHandler.init();
-
-        }
-
+    @SubscribeEvent
+    public static void registerRecipes(RegistryEvent.Register<IRecipe> event) {
+        // Initialize recipe handlers
+        WFCoreRecipeHandler.init();
 
     }
+
+
+}
