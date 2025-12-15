@@ -10,6 +10,8 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.oredict.ShapedOreRecipe;
+import net.minecraftforge.registries.ForgeRegistry;
+import net.minecraftforge.registries.IForgeRegistry;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
@@ -23,6 +25,9 @@ public class VanillaRecipes {
 
 
     public static void registerCTRecipes(RegistryEvent.Register<IRecipe> event) {
+        ForgeRegistry<IRecipe> registry = (ForgeRegistry<IRecipe>) event.getRegistry();
+
+        registry.remove(new ResourceLocation("hbm", "machine_ammo_press"));
 
         new ShapedOreRecSelfReg(
                 new ResourceLocation(MODID, "hbm_ammo_press"),
@@ -36,7 +41,8 @@ public class VanillaRecipes {
         ).setRegistryName(MODID, "hbm_ammo_press");
 
 
-        RECIPES.forEach(x -> event.getRegistry().register(x));
+        RECIPES.forEach(registry::register);
+
     }
 
     public static class ShapedOreRecSelfReg extends ShapedOreRecipe {
