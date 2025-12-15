@@ -13,6 +13,7 @@ import net.minecraftforge.oredict.ShapedOreRecipe;
 import net.minecraftforge.registries.ForgeRegistry;
 import net.minecraftforge.registries.IForgeRegistry;
 import org.jetbrains.annotations.NotNull;
+import wfcore.RefStrings;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -27,7 +28,7 @@ public class VanillaRecipes {
     public static void registerCTRecipes(RegistryEvent.Register<IRecipe> event) {
         ForgeRegistry<IRecipe> registry = (ForgeRegistry<IRecipe>) event.getRegistry();
 
-        registry.remove(new ResourceLocation("hbm", "machine_ammo_press"));
+        registry.remove(new ResourceLocation(RefStrings.HBM, "machine_ammo_press"));
 
         new ShapedOreRecSelfReg(
                 new ResourceLocation(MODID, "hbm_ammo_press"),
