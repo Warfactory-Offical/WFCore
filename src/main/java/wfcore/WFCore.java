@@ -1,19 +1,29 @@
 package wfcore;
 
+import com.hbm.blocks.ModBlocks;
 import gregtech.api.unification.material.event.MaterialEvent;
 import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.item.crafting.Ingredient;
+import net.minecraft.item.crafting.ShapedRecipes;
+import net.minecraft.util.NonNullList;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.*;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.oredict.ShapedOreRecipe;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import wfcore.common.proxy.CommonProxy;
 import wfcore.common.recipe.HBMRecepies;
+import wfcore.common.recipe.VanillaRecipes;
 import wfcore.common.recipe.chain.*;
 
 @Mod(modid = Tags.MODID, version = Tags.VERSION, name = Tags.MODNAME, acceptedMinecraftVersions = "[1.12.2]")
@@ -35,6 +45,7 @@ public class WFCore {
     public void registerRecipes(RegistryEvent.Register<IRecipe> event) {
         SteamWiremillRecipes.init();
         LargeBlastFurnace.init();
+        VanillaRecipes.registerCTRecipes(event);
     }
 
     @SubscribeEvent
