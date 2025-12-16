@@ -7,7 +7,7 @@ import java.util.Set;
 
 public class ItemRegistry {
 
+    //Declare public static final items here
     public static final Set<Item> ITEMS =  new HashSet<>();
 
-    public static registerItems()
 }
