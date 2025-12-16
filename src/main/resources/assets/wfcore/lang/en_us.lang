@@ -38,3 +38,7 @@ item.material.oreprefix.wiredense=%s Dense Wire
 item.material.oreprefix.shell=%s Shell
 item.material.oreprefix.plateTriple=Cast %s Plate
 item.material.oreprefix.plateSextuple=Welded %s Plate
+
+# gommers shenanigans
+item.hbm.ingot_asbestos.name=Asbestos Ingot
+ death.attack.asbestos=%1$s ascended to the great insulation warehouse in the sky

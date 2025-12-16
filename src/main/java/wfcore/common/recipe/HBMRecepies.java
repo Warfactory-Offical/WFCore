@@ -29,7 +29,9 @@ public class HBMRecepies {
     private static void addSolderingRecepies(FMLLoadCompleteEvent event) {
         ;
         var solderingRecepies = SolderingRecipes.recipes;
+        //removes default recipes
         solderingRecepies.clear();
+        //adds new recipe
         solderingRecepies.add(
                 new SolderingRecipes.SolderingRecipe(
                         MetaItems.ELECTRONIC_CIRCUIT_LV.getStackForm(1),
