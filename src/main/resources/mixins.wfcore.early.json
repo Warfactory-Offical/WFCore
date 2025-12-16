@@ -5,10 +5,14 @@
   "minVersion": "0.8",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-    "vanilla.CombatRulesMixin",
-    "vanilla.RenderLivingLabelMixin",
-    "vanilla.RenderNameplateMixin"
   ],
-  "client": [],
-  "server": []
+  "client": [
+    "vanilla.DebugRemover",
+    "vanilla.RenderLivingLabelMixin",
+    "vanilla.RenderNameplateMixin",
+    "vanilla.GuiDebugRemover"
+  ],
+  "server": [
+    "vanilla.CombatRulesMixin"
+  ]
 }

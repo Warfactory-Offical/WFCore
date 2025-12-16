@@ -1,14 +1,17 @@
 package wfcore;
 
 import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
 import net.minecraft.item.Item;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.*;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.relauncher.Side;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import wfcore.common.proxy.CommonProxy;
@@ -24,6 +27,7 @@ public class WFCore {
 
     public static final Logger LOGGER = LogManager.getLogger(Tags.MODID);
     public static final String MODID = "wfcore";
+    public static final boolean DEBUG = false;
 
     public static CommonProxy proxy;
 
@@ -60,6 +64,7 @@ public class WFCore {
 
     @EventHandler
     public void init(FMLLoadCompleteEvent event) {
+        if(FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT)
         HBMRecepies.init(event);
     }
 
