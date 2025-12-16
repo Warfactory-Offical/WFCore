@@ -1,7 +1,6 @@
 package wfcore.api;
 
 
-import lombok.SneakyThrows;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.block.statemap.StateMapperBase;
 import net.minecraft.client.renderer.color.IBlockColor;
@@ -19,11 +18,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public interface IDynamicModels {
+public interface SelfRegisteringModel {
     /**
      * Should be populated by implementors in constructors.
      */
-    List<com.hbm.items.IDynamicModels> INSTANCES = new ArrayList<>();
+    List<SelfRegisteringModel> INSTANCES = new ArrayList<>();
 
     @SideOnly(Side.CLIENT)
     static void bakeModels(ModelBakeEvent event) {
@@ -32,7 +31,7 @@ public interface IDynamicModels {
 
     @SideOnly(Side.CLIENT)
     static void registerModels() {
-        INSTANCES.forEach(com.hbm.items.IDynamicModels::registerModel);
+        INSTANCES.forEach(SelfRegisteringModel::registerModel);
     }
 
     @SideOnly(Side.CLIENT)
@@ -42,7 +41,7 @@ public interface IDynamicModels {
 
     @SideOnly(Side.CLIENT)
     static void registerCustomStateMappers() {
-        for (com.hbm.items.IDynamicModels model : INSTANCES) {
+        for (SelfRegisteringModel model : INSTANCES) {
             if (model.getSelf() == null || !(model.getSelf() instanceof Block block)) continue;
             StateMapperBase mapper = model.getStateMapper(block.getRegistryName());
             if (mapper != null)
@@ -56,7 +55,7 @@ public interface IDynamicModels {
 
     @SideOnly(Side.CLIENT)
     static void registerItemColorHandlers(ColorHandlerEvent.Item evt) {
-        for (com.hbm.items.IDynamicModels model : INSTANCES) {
+        for (SelfRegisteringModel model : INSTANCES) {
             IItemColor colorHandler = model.getItemColorHandler();
             Object self = model.getSelf();
 
@@ -68,7 +67,7 @@ public interface IDynamicModels {
 
     @SideOnly(Side.CLIENT)
     static void registerBlockColorHandlers(ColorHandlerEvent.Block evt) {
-        for (com.hbm.items.IDynamicModels model : INSTANCES) {
+        for (SelfRegisteringModel model : INSTANCES) {
             IBlockColor colorHandler = model.getBlockColorHandler();
             Object self = model.getSelf();
 
