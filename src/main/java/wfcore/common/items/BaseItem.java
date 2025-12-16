@@ -23,6 +23,7 @@ public class BaseItem extends Item implements SelfRegisteringModel {
     public BaseItem(String s, String texturePath) {
         this.setRegistryName(s);
         this.texturePath = texturePath;
+        this.setTranslationKey(s);
         INSTANCES.add(this);
         ItemRegistry.ITEMS.add(this);
     }
