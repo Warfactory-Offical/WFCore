@@ -43,6 +43,7 @@ public class WFCore {
         SteamWiremillRecipes.init();
         LargeBlastFurnace.init();
         VanillaRecipes.registerCTRecipes(event);
+        VanillaRecipes.registerFurnaceRecipes(event);
     }
 
     @SubscribeEvent

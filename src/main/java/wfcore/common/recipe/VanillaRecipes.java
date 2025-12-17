@@ -2,6 +2,9 @@ package wfcore.common.recipe;
 
 import com.hbm.blocks.ModBlocks;
 import com.hbm.items.ModItems;
+import gregtech.api.GTValues;
+import gregtech.common.items.MetaItems;
+import gregtech.common.metatileentities.MetaTileEntities;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
@@ -14,10 +17,11 @@ import net.minecraftforge.oredict.ShapedOreRecipe;
 import net.minecraftforge.registries.ForgeRegistry;
 import org.jetbrains.annotations.NotNull;
 import wfcore.RefStrings;
+import wfcore.common.util.FurnaceUtil;
+
 import java.util.HashSet;
 import java.util.Set;
-import gregtech.common.metatileentities.MetaTileEntities;
-import gregtech.api.GTValues;
+
 import static wfcore.WFCore.MODID;
 
 //this is where all the vanilla crafting type recipes (crafting table, furance, etc) we are modifying are stored.
@@ -25,6 +29,9 @@ import static wfcore.WFCore.MODID;
 public class VanillaRecipes {
     private static final Set<IRecipe> RECIPES = new HashSet<>();
 
+    public static void registerFurnaceRecipes(RegistryEvent.Register<IRecipe> event){
+        FurnaceUtil.removeByOutput(MetaItems.FIRECLAY_BRICK.getStackForm(1));
+    }
 
     public static void registerCTRecipes(RegistryEvent.Register<IRecipe> event) {
         ForgeRegistry<IRecipe> registry = (ForgeRegistry<IRecipe>) event.getRegistry();
@@ -154,7 +161,6 @@ public class VanillaRecipes {
                 "on");
 
 
-
         // small basin recipe
 
         registry.remove(new ResourceLocation(RefStrings.HBM, "foundry_mold"));
@@ -217,6 +223,7 @@ public class VanillaRecipes {
         RECIPES.forEach(registry::register);
 
     }
+
 
     public static class ShapedOreRecSelfReg extends ShapedOreRecipe {
 
