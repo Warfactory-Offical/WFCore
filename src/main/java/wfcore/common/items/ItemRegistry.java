@@ -5,6 +5,7 @@ import net.minecraft.item.Item;
 import java.util.HashSet;
 import java.util.Set;
 
+@SuppressWarnings("unused")
 public class ItemRegistry {
 
     //Declare public static final items here
