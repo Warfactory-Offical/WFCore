@@ -17,7 +17,7 @@ import net.minecraftforge.oredict.ShapedOreRecipe;
 import net.minecraftforge.registries.ForgeRegistry;
 import org.jetbrains.annotations.NotNull;
 import wfcore.RefStrings;
-import wfcore.common.util.FurnaceUtil;
+import wfcore.api.util.FurnaceUtil;
 
 import java.util.HashSet;
 import java.util.Set;
