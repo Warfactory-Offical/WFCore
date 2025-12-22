@@ -14,4 +14,6 @@ public class ItemRegistry {
     //Texture should be in assets/wfcore/textures/items
     public static final Item example = new BaseItem("screwdriver", "screwdriver_default");
 
+    public static final RadarProbe RADAR_PROBE = new RadarProbe("radar_probe", "radar_probe");
+
 }

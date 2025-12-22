@@ -39,6 +39,13 @@ item.material.oreprefix.shell=%s Shell
 item.material.oreprefix.plateTriple=Cast %s Plate
 item.material.oreprefix.plateSextuple=Welded %s Plate
 
+# items
+item.radar_probe.name=Radar Debug Probe
+
+# info
+info.radar_probe.default=Used to show the names the radar will need to be supplied to target specific (tile) entities.
+info.radar_probe.advanced=The CASIO fx-9750GII is a cool programmable calculator
+
 # gommers shenanigans
 item.hbm.ingot_asbestos.name=Asbestos Ingot
  death.attack.asbestos=%1$s ascended to the great insulation warehouse in the sky
