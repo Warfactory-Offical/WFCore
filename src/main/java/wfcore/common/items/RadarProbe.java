@@ -2,18 +2,19 @@ package wfcore.common.items;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.entity.EntityList;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.*;
 import net.minecraft.world.IWorldNameable;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import wfcore.api.radar.RadarTargetIdentifier;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -23,14 +24,98 @@ public class RadarProbe extends BaseItem {
         super(s, texturePath);
     }
 
+    // called on any right click
+    /*
     @Override
-    public EnumActionResult onItemUse(EntityPlayer player, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ)
+    public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand handIn) {
+        ItemStack heldStack = playerIn.getHeldItem(handIn);
+        if (!worldIn.isRemote) { return new ActionResult<>(EnumActionResult.PASS, heldStack); }
+        RayTraceResult raytraceresult = this.rayTrace(worldIn, playerIn, false);
+
+        // intellij doesn't know what it's talking about; this can definitely occur
+        if (raytraceresult == null) {
+            playerIn.sendMessage(new TextComponentString("Got a null raytrace; returning").setStyle(new Style().setColor(TextFormatting.RED)));
+            return new ActionResult<>(EnumActionResult.FAIL, heldStack);
+        }
+
+        // this method does not handle anything other than entity hits
+        if (raytraceresult.typeOfHit != RayTraceResult.Type.ENTITY) {
+            playerIn.sendMessage(new TextComponentString("Got a type of hit which was not an entity: " + raytraceresult.typeOfHit).setStyle(new Style().setColor(TextFormatting.RED)));
+            return new ActionResult<>(EnumActionResult.PASS, heldStack);
+        }
+
+        // get the entity key
+        ResourceLocation entityKey = EntityList.getKey(raytraceresult.entityHit);
+        if (entityKey == null) { entityKey = new ResourceLocation("NULL"); }
+
+        // get the entity string
+        String entityString = EntityList.getEntityString(raytraceresult.entityHit);
+        if (entityString == null) { entityString = "NULL"; }
+
+        String entityTranslationKey = EntityList.getTranslationName(entityKey);
+
+        ITextComponent translatedName = new TextComponentString("NULL");
+        if (entityTranslationKey != null) { translatedName = new TextComponentTranslation(entityTranslationKey); }
+        else { entityTranslationKey = "NULL"; }
+
+        // send the display name
+        playerIn.sendMessage(new TextComponentString("\nTarget entity's display name is:"));
+        playerIn.sendMessage(translatedName.setStyle(new Style().setColor(TextFormatting.AQUA)));
+        playerIn.sendMessage(new TextComponentString("\nTarget entity's string is:"));
+        playerIn.sendMessage(new TextComponentString(entityString).setStyle(new Style().setColor(TextFormatting.AQUA)));
+        playerIn.sendMessage(new TextComponentString("\nTarget entity's translation key is:"));
+        playerIn.sendMessage(new TextComponentString(entityTranslationKey).setStyle(new Style().setColor(TextFormatting.AQUA)));
+
+        // new line
+        playerIn.sendMessage(new TextComponentString(""));
+
+        return new ActionResult<>(EnumActionResult.SUCCESS, heldStack);
+    } */
+
+    // called when an entity is clicked (presumably something extending entitylivingbase only?)
+    public boolean itemInteractionForEntity(ItemStack stack, EntityPlayer player, EntityLivingBase target, EnumHand hand) {
+        // get the entity key
+        ResourceLocation entityKey = EntityList.getKey(target);
+        if (entityKey == null) { entityKey = new ResourceLocation("NULL"); }
+
+        // get the entity string
+        String entityString = EntityList.getEntityString(target);
+        if (entityString == null) { entityString = "NULL"; }
+
+        String entityTranslationKey = EntityList.getTranslationName(entityKey);
+
+        ITextComponent translatedName = new TextComponentString("NULL");
+        if (entityTranslationKey != null) { translatedName = new TextComponentTranslation(entityTranslationKey); }
+        else { entityTranslationKey = "NULL"; }
+
+        // send the display name
+        player.sendMessage(new TextComponentString("\nTarget entity's display name is:"));
+        player.sendMessage(translatedName.setStyle(new Style().setColor(TextFormatting.AQUA)));
+        player.sendMessage(new TextComponentString("\nTarget entity's resource location is:"));
+        player.sendMessage(new TextComponentString(entityKey.toString()).setStyle(new Style().setColor(TextFormatting.AQUA)));
+        player.sendMessage(new TextComponentString("\nTarget entity's string is:"));
+        player.sendMessage(new TextComponentString(entityString).setStyle(new Style().setColor(TextFormatting.AQUA)));
+        player.sendMessage(new TextComponentString("\nTarget entity's translation key is:"));
+        player.sendMessage(new TextComponentString(entityTranslationKey).setStyle(new Style().setColor(TextFormatting.AQUA)));
+
+        // new line
+        player.sendMessage(new TextComponentString(""));
+        player.sendMessage(new TextComponentString("Radar Target Identifier result: "));
+        player.sendMessage(new TextComponentString(RadarTargetIdentifier.getBestIdentifier(target).toString()).setStyle(new Style().setColor(TextFormatting.BLUE)));
+        player.sendMessage(new TextComponentString(""));
+
+        return true;
+    }
+
+    // called when clicking on a block
+    @Override
+    public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ)
     {
-        if (!worldIn.isRemote) { return EnumActionResult.PASS; }  // don't run on server; client only util
+        if (!world.isRemote) { return EnumActionResult.PASS; }
 
         // get the targeted blockstate and check if a tile entity could be associated; if not, indicate and return
-        IBlockState targState = worldIn.getBlockState(pos);
-        TileEntity targTE = worldIn.getTileEntity(pos);
+        IBlockState targState = world.getBlockState(pos);
+        TileEntity targTE = world.getTileEntity(pos);
         if (targTE == null) {
             player.sendMessage(new TextComponentString("Target <" + targState + "> does not have an associated TE").setStyle(new Style().setColor(TextFormatting.RED)));
             return EnumActionResult.PASS;
@@ -40,6 +125,14 @@ public class RadarProbe extends BaseItem {
         ITextComponent targTEDisplayName = targTE.getDisplayName();
         String displayNameKey = "NULL";
         String formattedDisplayName = "NULL";
+
+        // get the te resource for later display
+        ResourceLocation teResource = TileEntity.getKey(targTE.getClass());
+        if (teResource == null) {
+            teResource = new ResourceLocation("NULL");
+        } else if (teResource.toString().length() < 1) {
+            teResource = new ResourceLocation("EMPTY");
+        }
 
         // try to get a more interesting display name
         if (targTEDisplayName != null) {
@@ -61,6 +154,8 @@ public class RadarProbe extends BaseItem {
         // send the display name
         player.sendMessage(new TextComponentString("\nTarget's display name is:"));
         player.sendMessage(new TextComponentString(formattedDisplayName).setStyle(new Style().setColor(TextFormatting.AQUA)));
+        player.sendMessage(new TextComponentString("\nTarget's resource location is:"));
+        player.sendMessage(new TextComponentString(teResource.toString()).setStyle(new Style().setColor(TextFormatting.AQUA)));
         player.sendMessage(new TextComponentString("\nTarget's unformatted name is:"));
         player.sendMessage(new TextComponentString(displayNameKey).setStyle(new Style().setColor(TextFormatting.AQUA)));
 
@@ -80,6 +175,9 @@ public class RadarProbe extends BaseItem {
         }
 
         // new line
+        player.sendMessage(new TextComponentString(""));
+        player.sendMessage(new TextComponentString("Radar Target Identifier result: "));
+        player.sendMessage(new TextComponentString(RadarTargetIdentifier.getBestIdentifier(targTE).toString()).setStyle(new Style().setColor(TextFormatting.BLUE)));
         player.sendMessage(new TextComponentString(""));
 
         return EnumActionResult.SUCCESS;

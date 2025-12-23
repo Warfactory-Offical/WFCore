@@ -30,4 +30,9 @@ public class IntCoord2 implements Clusterable {
     public double[] getPoint() {
         return new double[]{X, Z};
     }
+
+    @Override
+    public String toString() {
+        return "(" + X + ", " + Z + ")";
+    }
 }

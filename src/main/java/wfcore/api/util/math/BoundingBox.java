@@ -15,4 +15,9 @@ public class BoundingBox {
     public IntCoord2 getMax() {
         return max;
     }
+
+    @Override
+    public String toString() {
+        return "{" + min.toString() + ", " + max.toString() + "}";
+    }
 }

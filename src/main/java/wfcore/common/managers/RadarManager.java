@@ -6,15 +6,16 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import org.apache.commons.math3.ml.clustering.Cluster;
 import org.apache.commons.math3.ml.clustering.DBSCANClusterer;
-import wfcore.common.data.BoundingBox;
-import wfcore.common.data.ClusterData;
-import wfcore.common.data.IntCoord2;
+import wfcore.api.util.math.BoundingBox;
+import wfcore.api.util.math.ClusterData;
+import wfcore.api.util.math.IntCoord2;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+//TODO: Figure out if this can be removed; does this even do anything?
 public class RadarManager {
 
     public static final RadarManager INSTANCE = new RadarManager();
@@ -67,10 +68,11 @@ public class RadarManager {
                     sumX += x;
                     sumZ += z;
                 }
+
                 IntCoord2 boundingBoxMin = new IntCoord2(minX, minZ);
                 IntCoord2 boundingBoxMax = new IntCoord2(maxX, maxZ);
                 IntCoord2 clusterCenter = new IntCoord2(sumX / clusterPoints.size(), sumZ / clusterPoints.size());
-                clusterDataList.add(new ClusterData(clusterPoints, clusterCenter, new BoundingBox(boundingBoxMin, boundingBoxMax)));
+                clusterDataList.add(new ClusterData(clusterPoints, clusterCenter, new BoundingBox(boundingBoxMin, boundingBoxMax), -1));
             }
 
             return clusterDataList;

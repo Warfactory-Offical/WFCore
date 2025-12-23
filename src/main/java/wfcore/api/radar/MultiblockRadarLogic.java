@@ -1,7 +1,5 @@
-package wfcore.api.recipes;
+package wfcore.api.radar;
 
-import gregtech.api.metatileentity.MetaTileEntity;
-import it.unimi.dsi.fastutil.objects.Object2ObjectSortedMap;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
@@ -11,15 +9,16 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import org.apache.commons.math3.ml.clustering.Cluster;
 import org.apache.commons.math3.ml.clustering.DBSCANClusterer;
+import org.yaml.snakeyaml.Yaml;
 import wfcore.WFCore;
 import wfcore.api.util.math.ClusterData;
 import wfcore.api.util.math.IntCoord2;
 import wfcore.api.util.math.BoundingBox;
+import wfcore.common.metatileentities.multi.electric.MetaTileEntityRadar;
 
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.io.Writer;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -36,15 +35,14 @@ public class MultiblockRadarLogic {
 
     private int voltageTier;
     private int overclockAmount;
-    private int speed;
     private Map<IntCoord2, Object> LoadedValidObjects  = new HashMap<>();
     private List<ClusterData> scanResults = new ArrayList<>();
-    private MetaTileEntity metaTileEntity;
-    private boolean isFinished;
-    private boolean isActive = false;
-    private boolean isWorkingEnabled = true;
+    private MetaTileEntityRadar metaTileEntity;
+    private boolean isActive;
+    private boolean canWork;
 
-    public static ObjectOpenHashSet<TileEntity> TE_WHITELIST = new ObjectOpenHashSet<>();
+    public static ObjectOpenHashSet<RadarTargetIdentifier> TE_WHITELIST = new ObjectOpenHashSet<>();
+    public static ObjectOpenHashSet<RadarTargetIdentifier> ENTITY_WHITELIST = new ObjectOpenHashSet<>();
 
     private static Path CONFIG_PATH = Paths.get("config/" + WFCore.MODID + "/radar.cfg");
 
@@ -59,15 +57,20 @@ public class MultiblockRadarLogic {
             " - category: bright",
             "   intensity: 10",
             "   targets:",
-            "     - gregtech:machine"
+            "     - gregtech:machine.energy_hatch.input.lv.name",
+            "     - hbm:tileentity_bobble"
     ));
 
     // this may be useful eventually, but currently handling each mod's method of registering tile entities is too involved
     public static void readRadarConfig() {
+        Map<String, Object> globalRadarData;
+        WFCore.LOGGER.atDebug().log("Beginning reading of radar config.");
+
         // read from the file
         try {
             writeStubIfEmpty();
-            throw new IllegalStateException("Testing this error");
+            InputStream inputStream = new FileInputStream(CONFIG_PATH.toFile());  // will throw if no file exists
+            globalRadarData = new Yaml().load(inputStream);  // get a mapping of keys to objects
         } catch (IOException ioError) {
             logExceptionWithTrace("Failed in stub write and config parse step [" + ioError.getMessage() + "]. Trace:", ioError);
             return;
@@ -77,6 +80,35 @@ public class MultiblockRadarLogic {
         }
 
         // interpret the file
+        List<Map<String, Object>> blocks = (List<Map<String, Object>>) globalRadarData.get("blocks");
+        List<Map<String, Object>> entities = (List<Map<String, Object>>) globalRadarData.get("entities");
+
+        populateWhitelist(TE_WHITELIST, blocks);
+        populateWhitelist(ENTITY_WHITELIST, entities);
+
+        WFCore.LOGGER.atDebug().log("Finished reading radar config");
+    }
+
+    private static void populateWhitelist(
+            ObjectOpenHashSet<RadarTargetIdentifier> whitelist,
+            List<Map<String, Object>> targetContainer) {
+        if (targetContainer == null) { return; }  // handle empty config
+
+        for (Map<String, Object> category : targetContainer) {
+            // get the current categories intensity and ensure an entry exists for it
+            int intensity = ((Number)category.get("intensity")).intValue();
+
+            // parse all the targets
+            for (String target : (List<String>) category.get("targets")) {
+                var identifier = new RadarTargetIdentifier(target);
+                if (whitelist.contains(identifier)) {
+                    WFCore.LOGGER.atInfo().log("Found duplicate instance of identifier " + identifier);
+                    continue;
+                }
+
+                whitelist.add(identifier.intensity(intensity));
+            }
+        }
     }
 
     public static void writeStubIfEmpty() throws IOException {
@@ -92,13 +124,36 @@ public class MultiblockRadarLogic {
         }
     }
 
-    public MultiblockRadarLogic(int voltageTier, int overclockAmount, int speed, gregtech.api.metatileentity.MetaTileEntity metaTileEntity) {
-        this.voltageTier = voltageTier;
-        this.overclockAmount = overclockAmount;
-        this.speed = speed;
+    public MultiblockRadarLogic(MetaTileEntityRadar metaTileEntity) {
+        this.voltageTier = -1;
+        this.overclockAmount = 0;
         this.metaTileEntity = metaTileEntity;
-        this.isFinished = false;
+    }
 
+    public void structureFormed() {
+        canWork = true;
+        isActive = false;
+        this.voltageTier = metaTileEntity.getTier();
+        this.overclockAmount = 0;  //TODO: Decide how we want to calculate overclock based on tier
+    }
+
+    public void invalidateStructure() {
+        canWork = false;
+        isActive = false;
+    }
+
+    // synchronized access for reading or write to the scan results, passing null to return a copy arraylist
+    public synchronized List<ClusterData> accessScanResults(List<ClusterData> input) {
+        if (input == null) {
+            return new ArrayList<ClusterData>(scanResults);
+        }
+
+        scanResults = input;
+        return null;
+    }
+
+    private boolean canScan() {
+        return !metaTileEntity.getWorld().isRemote && metaTileEntity.isStructureFormed() && canWork() && !isActive();
     }
 
         /* Scan should do as follows:
@@ -113,32 +168,27 @@ public class MultiblockRadarLogic {
     //Perhaps some visualization in the tablet?
     //OPTIONAL: integrate Map mod with the mod, so players have bounding boxes drawn on their minimap, with all valid TEs  pointed out and waypoints to the centers
 
-    public void performScan() {
-        if (metaTileEntity.getWorld().isRemote)
-            return;
-
-        if(!this.isWorkingEnabled)
-            return;
-
-        if(!checkCanScan())
-            return;
+    public boolean performScan() {
+        // only scan on server
+        if (!canScan()) { return false; }
 
         //Scanner cannot perform a scan if data is already written
-        if(!dataSlotIsEmpty() && !dataSlotIsWritten()){
+        if(true || !dataSlotIsEmpty() && !dataSlotIsWritten()){
             //Get the snapshot of all loaded players TEs
             this.LoadedValidObjects  = this.collectValidEntites();
             //Run dbscan
-            calculateDBSCAN(LoadedValidObjects).thenAccept(clusterData -> {
-                this.scanResults = clusterData;
-            }).exceptionally(ex -> {
+            //this.scanResults = clusterData;
+            calculateDBSCAN(LoadedValidObjects).thenAccept(this::accessScanResults).exceptionally(ex -> {
                 System.err.println("Error during DBSCAN calculation: " + ex.getMessage());
                 return null;
             });
         }
+
+        return true;
     }
 
     public static boolean isOnTEWhitelist(TileEntity tileEntity) {
-        return TE_WHITELIST.contains(tileEntity);
+        return TE_WHITELIST.contains(RadarTargetIdentifier.getBestIdentifier(tileEntity));
     }
 
     static public IntCoord2 getCoordPair(BlockPos pos) {
@@ -232,29 +282,19 @@ public class MultiblockRadarLogic {
         return voltageTier;
     }
 
-    public void setVoltageTier(int tier) {
-        this.voltageTier = tier;
-    }
-
     public int getOverclockAmount() {
         return this.overclockAmount;
     }
 
-    public void setOverclockAmount(int amount) {
-        this.overclockAmount = amount;
+    public boolean canWork() {
+        return canWork;
     }
 
-    public void getSpeed() {
+    public boolean isActive() {
+        return isActive;
     }
 
-    public boolean isWorking() {
-        return false;
-    }
 
-    public boolean checkCanScan(){
-        //FIXME
-        return true;
-    }
     public boolean dataSlotIsEmpty(){
         //FIXME
         return false;
@@ -263,14 +303,6 @@ public class MultiblockRadarLogic {
     public boolean dataSlotIsWritten(){
         //FIXME
         return false;
-    }
-
-    public boolean isActive() {
-        return isActive;
-    }
-
-    public void setActive(boolean active) {
-        isActive = active;
     }
 
     public NBTTagCompound writeToNBT(NBTTagCompound data) {

@@ -1,5 +1,6 @@
 package wfcore;
 
+import net.minecraftforge.event.entity.EntityEvent;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
@@ -7,7 +8,7 @@ import net.minecraftforge.fml.common.event.*;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import wfcore.api.recipes.MultiblockRadarLogic;
+import wfcore.api.radar.MultiblockRadarLogic;
 import wfcore.common.proxy.CommonProxy;
 
 @Mod(modid = Tags.MODID, version = Tags.VERSION, name = Tags.MODNAME, acceptedMinecraftVersions = "[1.12.2]",
@@ -17,7 +18,7 @@ public class WFCore {
 
     public static final Logger LOGGER = LogManager.getLogger(Tags.MODID);
     public static final String MODID = "wfcore";
-    public static final boolean DEBUG = false;
+    public static final boolean DEBUG = true;
 
     @SidedProxy(
             clientSide = "wfcore.common.proxy.ClientProxy",
@@ -55,7 +56,7 @@ public class WFCore {
         proxy.serverStarting(event);
     }
 
-    // we need to check all placed blocks to see if they are on the radar whitelist
+    // we need may want to check blocks after they are placed to track them
     @SubscribeEvent
     public void blockPlaced(BlockEvent.EntityPlaceEvent event) {
         // only handle on server
@@ -64,5 +65,14 @@ public class WFCore {
         }
 
 
+    }
+
+    // we may want to inspect all entities when they are created
+    @SubscribeEvent
+    public void entityConstructing(EntityEvent.EntityConstructing event) {
+        // only handle on server
+        if (event.getEntity().getEntityWorld().isRemote) {
+            return;
+        }
     }
 }
