@@ -1,6 +1,5 @@
 package wfcore.common.events;
 
-import com.modularmods.mcgltf.MCglTF;
 import gregtech.api.unification.material.event.MaterialEvent;
 import gregtech.api.unification.material.event.PostMaterialEvent;
 import gregtech.common.items.MetaItems;

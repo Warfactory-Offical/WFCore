@@ -12,39 +12,90 @@ import wfcore.common.te.TERegistry;
 
 import java.util.Collection;
 
+/**
+ * Interface for MetaTileEntities that support animated rendering.
+ * <p>
+ * Implementing classes provide access to animation state, transformation,
+ * hidden blocks, and other rendering-related metadata.
+ * This interface is intended to be used client-side for rendering and server-side
+ * for animation state management.
+ */
 public interface IAnimatedMTE extends IFastRenderMetaTileEntity {
 
-
-    public default Vec3d getTransform() {
+    /**
+     * Returns the local transformation offset for rendering.
+     * <p>
+     * This is the position offset applied before rendering the GLTF model.
+     * Default is {@link Vec3d#ZERO} (no offset).
+     *
+     * @return a Vec3d representing the local transform
+     */
+    default Vec3d getTransform() {
         return Vec3d.ZERO;
     }
 
-    ;
-
+    /**
+     * Returns the collection of block positions that should be hidden when rendering this tile entity.
+     * Useful for multiblocks where internal components should not be drawn.
+     *
+     * @return a collection of BlockPos to hide
+     */
     Collection<BlockPos> getHiddenBlocks();
 
-    public default String getAnimState() {
+    /**
+     * Returns the current animation state name.
+     * <p>
+     * Used to select which AnimationLoop to play in the renderer.
+     * Default is "default".
+     *
+     * @return the current animation state
+     */
+    default String getAnimState() {
         return "default";
     }
-    public long getAnimEpoch();
 
+    /**
+     * Returns the "epoch" of the current animation in ticks.
+     * <p>
+     * This value is used to compute animation progress relative to world time.
+     * Typically set on the server when an animation starts or resumes.
+     *
+     * @return world tick timestamp when the animation began
+     */
+    long getAnimEpoch();
 
-
+    /**
+     * Utility method to cast this tile entity to its concrete type.
+     *
+     * @param <T> concrete MetaTileEntity type
+     * @return this instance cast to T
+     */
     @SuppressWarnings("unchecked")
     default <T extends MetaTileEntity> T thisObject() {
         return (T) this;
     }
 
+    /**
+     * Returns the unique name of this MetaTileEntity.
+     * Typically derived from its registry ID.
+     *
+     * @return the tile entity name
+     */
     default String getName() {
         return thisObject().metaTileEntityId.getPath();
     }
 
-    // Should only be called on the server side
+    /**
+     * Disables or enables rendering for specific blocks on the server.
+     * <p>
+     * Sends a packet to all clients in the dimension to hide or show
+     * blocks returned by {@link #getHiddenBlocks()}.
+     * <b>Server-side only.</b>
+     *
+     * @param disable true to hide blocks, false to show
+     */
     default void disableBlockRendering(boolean disable) {
         World world = thisObject().getWorld();
-        // Special case for server worlds that exists on client side
-        // E.g., TrackedDummyWorld
-        // This should at least cover the ones in CEu & MUI2
         if (world.getMinecraftServer() != null) {
             BlockPos pos = thisObject().getPos();
             int dimId = world.provider.getDimension();
@@ -53,21 +104,46 @@ public interface IAnimatedMTE extends IFastRenderMetaTileEntity {
         }
     }
 
-    public default boolean shouldRender() {
+    /**
+     * Determines whether this tile entity should be rendered.
+     * <p>
+     * Used to conditionally skip rendering for client-side optimization.
+     *
+     * @return true if this tile entity should be rendered, false otherwise
+     */
+    default boolean shouldRender() {
         return true;
     }
 
-    // If this returns true, the TESR will keep rendering even when the chunk is culled.
+    /**
+     * If true, the TESR will continue rendering even when the chunk is culled.
+     * <p>
+     * This is useful for animated multiblocks or objects that must always be visible.
+     *
+     * @return true if rendering should ignore chunk culling
+     */
     @Override
     default boolean isGlobalRenderer() {
         return true;
     }
 
+    /**
+     * Renders this MetaTileEntity.
+     * <p>
+     * Default implementation looks up the renderer from {@link TERegistry}
+     * and delegates the render call.
+     *
+     * @param x            X coordinate for rendering
+     * @param y            Y coordinate for rendering
+     * @param z            Z coordinate for rendering
+     * @param partialTicks partial tick time for interpolation
+     */
     @Override
     default void renderMetaTileEntity(double x, double y, double z, float partialTicks) {
         if (thisObject().getWorld() == Minecraft.getMinecraft().world && shouldRender()) {
-            TERegistry.getRenderer(thisObject().getClass()).render(thisObject(), x, y, z, partialTicks);
+            TERegistry.getRenderer(thisObject().getClass())
+                    .render(thisObject(), x, y, z, partialTicks);
         }
-
     }
 }
+

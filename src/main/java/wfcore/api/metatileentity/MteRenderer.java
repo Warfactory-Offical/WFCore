@@ -17,13 +17,50 @@ import wfcore.common.render.AnimationLoop;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * Base renderer class for MetaTileEntities that support GLTF animations.
+ * <p>
+ * This class provides the core rendering logic for GLTF models and animation loops,
+ * including transformation handling, rotation/flipping based on multiblock orientation,
+ * and OpenGL state management. Subclasses must implement {@link #renderGLTF} to define
+ * per-tile rendering behavior.
+ *
+ * @param <T> the type of MetaTileEntity this renderer supports,
+ *            must implement {@link IAnimatedMTE}
+ */
 public abstract class MteRenderer<T extends MetaTileEntity & IAnimatedMTE> implements IGltfModelReceiver {
 
+    /**
+     * Map of animation names to their corresponding {@link AnimationLoop} objects.
+     * <p>
+     * Populated when the GLTF model is received through {@link #onReceiveSharedModel}.
+     * Subclasses should retrieve and update animations from this map during rendering.
+     */
     public ImmutableMap<String, AnimationLoop> animations;
+
+    /**
+     * The preprocessed, GPU-ready GLTF scene used for rendering.
+     * <p>
+     * Populated when the GLTF model is received via {@link #onReceiveSharedModel}.
+     */
     protected RenderedGltfScene renderedScene;
 
+    /**
+     * Rotates the model to face a specified direction.
+     * <p>
+     * Used to orient multiblock components based on their {@link EnumFacing} front
+     * and spin directions. Applies rotation and scaling to the OpenGL matrix.
+     *
+     * @param face the primary facing direction of the tile entity
+     * @param spin the "upward" or secondary facing direction
+     */
     public static void rotateToFace(EnumFacing face, EnumFacing spin) {
-        int angle = spin == EnumFacing.EAST ? 90 : spin == EnumFacing.SOUTH ? 180 : spin == EnumFacing.WEST ? 270 : 0;
+        int angle = switch (spin) {
+            case EAST -> 90;
+            case SOUTH -> 180;
+            case WEST -> 270;
+            default -> 0;
+        };
         switch (face) {
             case UP -> {
                 GlStateManager.scale(-1, 1, 1);
@@ -50,6 +87,14 @@ public abstract class MteRenderer<T extends MetaTileEntity & IAnimatedMTE> imple
         }
     }
 
+    /**
+     * Flips the model along axes according to the given facing.
+     * <p>
+     * Useful for mirrored multiblock components. Applies scaling
+     * transformations to the OpenGL matrix.
+     *
+     * @param facing the direction used to determine flip axes
+     */
     public static void flip(EnumFacing facing) {
         int fX = facing.getXOffset() == 0 ? 1 : -1;
         int fY = facing.getYOffset() == 0 ? 1 : -1;
@@ -57,6 +102,14 @@ public abstract class MteRenderer<T extends MetaTileEntity & IAnimatedMTE> imple
         GlStateManager.scale(fX, fY, fZ);
     }
 
+    /**
+     * Called when the GLTF model and animations are ready on the client.
+     * <p>
+     * Stores the first rendered scene and builds a map of {@link AnimationLoop} objects
+     * indexed by their names. Animations with a "_loop" suffix will have {@link AnimationLoop#loop} set to true.
+     *
+     * @param renderedModel the GLTF model wrapper containing the rendered scene and animation models
+     */
     @Override
     public void onReceiveSharedModel(RenderedGltfModel renderedModel) {
         renderedScene = renderedModel.renderedGltfScenes.get(0);
@@ -72,8 +125,26 @@ public abstract class MteRenderer<T extends MetaTileEntity & IAnimatedMTE> imple
         this.animations = animations.build();
     }
 
-    protected void render(T mte, double x, double y, double z,
-                          float partialTicks) {
+    /**
+     * Performs the full render process for a tile entity.
+     * <p>
+     * This includes:
+     * <ul>
+     *     <li>OpenGL matrix push/pop</li>
+     *     <li>Basic OpenGL state setup (shading, blending, rescale normals)</li>
+     *     <li>Translation to tile entity position + transform offset</li>
+     *     <li>Orientation/flip adjustments for multiblock controllers</li>
+     *     <li>Delegation to {@link #renderGLTF} for actual GLTF drawing</li>
+     *     <li>OpenGL state restoration</li>
+     * </ul>
+     *
+     * @param mte          the tile entity being rendered
+     * @param x            world X position
+     * @param y            world Y position
+     * @param z            world Z position
+     * @param partialTicks interpolation factor for smooth rendering
+     */
+    protected void render(T mte, double x, double y, double z, float partialTicks) {
         var vec3d = mte.getTransform();
         GlStateManager.pushMatrix();
         GlStateManager.shadeModel(GL11.GL_SMOOTH);
@@ -83,30 +154,37 @@ public abstract class MteRenderer<T extends MetaTileEntity & IAnimatedMTE> imple
                 GlStateManager.SourceFactor.SRC_ALPHA,
                 GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA
         );
-        {
 
+        EnumFacing front = mte.getFrontFacing();
+        GlStateManager.translate(x + 0.5, y + 0.5, z + 0.5);
+        GlStateManager.translate(vec3d.x, vec3d.y, vec3d.z);
 
-            EnumFacing front = mte.getFrontFacing();
-            GlStateManager.translate(x + 0.5, y + 0.5, z + 0.5);
-            GlStateManager.translate(vec3d.x, vec3d.y, vec3d.z);
+        if (mte instanceof MultiblockControllerBase controller) {
+            EnumFacing upwards = controller.getUpwardsFacing();
+            EnumFacing left = RelativeDirection.LEFT.getRelativeFacing(front, upwards, controller.isFlipped());
 
-            if (mte instanceof MultiblockControllerBase controller) {
-                EnumFacing upwards = controller.getUpwardsFacing();
-                EnumFacing left = RelativeDirection.LEFT.getRelativeFacing(front, upwards, controller.isFlipped());
-
-                if (controller.isFlipped()) flip(left);
-                rotateToFace(front, upwards);
-            }
-            renderGLTF(mte, partialTicks);
-
+            if (controller.isFlipped()) flip(left);
+            rotateToFace(front, upwards);
         }
+
+        renderGLTF(mte, partialTicks);
+
         GlStateManager.disableBlend();
         GlStateManager.disableRescaleNormal();
         GlStateManager.shadeModel(GL11.GL_FLAT);
         GlStateManager.popMatrix();
     }
 
-
+    /**
+     * Renders the GLTF model for the specific tile entity.
+     * <p>
+     * Subclasses must implement this to handle per-tile animation updates and
+     * drawing of the {@link RenderedGltfScene}.
+     *
+     * @param mte          the tile entity being rendered
+     * @param partialTicks partial tick interpolation
+     * @param <T>          ensures type safety with tile entity extending {@link IAnimatedMTE}
+     */
     abstract public <T extends MetaTileEntity & IAnimatedMTE> void renderGLTF(T mte, float partialTicks);
-
 }
+
