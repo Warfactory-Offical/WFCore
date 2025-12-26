@@ -32,6 +32,7 @@ import gregtech.client.renderer.ICubeRenderer;
 import gregtech.client.renderer.texture.Textures;
 import gregtech.common.blocks.BlockMachineCasing;
 import gregtech.common.blocks.MetaBlocks;
+import lombok.Getter;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -249,14 +250,14 @@ public class MetaTileEntityRadar extends MultiblockWithDisplayBase implements IA
         return new Vec3d(3.5, 9.5, 0);
     }
 
-    public String getAnimState(){
-        return "Idle";
-    }
+    @Getter
+    String animState = "idle";
+    @Getter
+    long animEpoch = 0l;
 
 
     @Override
     public boolean shouldRender() {
-//        return isStructureFormed();
         return true;
     }
     @Override

@@ -11,50 +11,35 @@ public class AnimationLoop {
         public final List<InterpolatedChannel> animation;
 
         @Getter @Setter
-        private boolean loop = true;
+        private boolean loop = false;
 
         @Getter
         private boolean finished = false;
 
-        private float startWorldTimeS = -1f;
 
         public AnimationLoop(List<InterpolatedChannel> animation) {
             this.animation = animation;
         }
 
-        public void reset() {
-            finished = false;
-            startWorldTimeS = -1f;
-        }
+       public void update(float t) {
+        float duration = getDuration();
 
-        public void update(float worldTimeS) {
-            if (finished) return;
-
-            if (startWorldTimeS < 0f) {
-                startWorldTimeS = worldTimeS;
-            }
-
-            float localTime = worldTimeS - startWorldTimeS;
-            float duration = getDuration();
-
-            float t = localTime;
-
-            if (t >= duration) {
-                if (loop) {
-                    t %= duration;
-                    startWorldTimeS = worldTimeS - t;
-                } else {
-                    t = duration;
-                    finished = true;
-                }
-            }
-
-            for (InterpolatedChannel channel : animation) {
-                channel.update(t);
+        if (t >= duration) {
+            if (loop) {
+                t %= duration;
+            } else {
+                t = duration;
+                finished = true;
             }
         }
 
-        private float getDuration() {
+        for (InterpolatedChannel channel : animation) {
+            channel.update(t);
+        }
+    }
+
+
+    private float getDuration() {
             float max = 0f;
             for (InterpolatedChannel c : animation) {
                 float[] keys = c.getKeys();

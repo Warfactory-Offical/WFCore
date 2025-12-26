@@ -11,17 +11,16 @@ import gregtech.api.metatileentity.multiblock.MultiblockControllerBase;
 import gregtech.api.util.RelativeDirection;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.Vec3i;
 import org.lwjgl.opengl.GL11;
 import wfcore.common.render.AnimationLoop;
 
 import java.util.List;
+import java.util.Locale;
 
 public abstract class MteRenderer<T extends MetaTileEntity & IAnimatedMTE> implements IGltfModelReceiver {
 
+    public ImmutableMap<String, AnimationLoop> animations;
     protected RenderedGltfScene renderedScene;
-
-    protected ImmutableMap<String, AnimationLoop> animations;
 
     public static void rotateToFace(EnumFacing face, EnumFacing spin) {
         int angle = spin == EnumFacing.EAST ? 90 : spin == EnumFacing.SOUTH ? 180 : spin == EnumFacing.WEST ? 270 : 0;
@@ -65,7 +64,10 @@ public abstract class MteRenderer<T extends MetaTileEntity & IAnimatedMTE> imple
         ImmutableMap.Builder<String, AnimationLoop> animations = ImmutableMap.builder();
         for (AnimationModel animationModel : animationModels) {
             var rawAnim = new AnimationLoop(GltfAnimationCreator.createGltfAnimation(animationModel));
-            animations.put(animationModel.getName(),rawAnim);
+            var name = animationModel.getName().toLowerCase(Locale.ROOT).split("_");
+            if (name.length > 1 && name[1].equals("loop"))
+                rawAnim.setLoop(true);
+            animations.put(animationModel.getName(), rawAnim);
         }
         this.animations = animations.build();
     }

@@ -1,7 +1,6 @@
 package wfcore.common.render;
 
 import com.modularmods.mcgltf.MCglTF;
-import com.modularmods.mcgltf.animation.InterpolatedChannel;
 import gregtech.api.metatileentity.MetaTileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.animation.Animation;
@@ -10,21 +9,26 @@ import wfcore.api.metatileentity.IAnimatedMTE;
 import wfcore.api.metatileentity.MteRenderer;
 import wfcore.common.metatileentities.multi.electric.MetaTileEntityRadar;
 
-public class RenderRadar extends MteRenderer<MetaTileEntityRadar> {
+public class GenericGLTF<T extends MetaTileEntity & IAnimatedMTE> extends MteRenderer<T> {
 
+    public final ResourceLocation modelResource;
+    public GenericGLTF(ResourceLocation modelResource) {
+        this.modelResource = modelResource;
+    }
 
     @Override
     public ResourceLocation getModelLocation() {
 
-        return new ResourceLocation(Tags.MODID, "model/radar.glb");
+        return modelResource;
     }
 
 
-    @Override
     public <T extends MetaTileEntity & IAnimatedMTE> void renderGLTF(T mte, float partialTicks) {
-        float time = Animation.getWorldTime(mte.getWorld(), partialTicks);
+        float worldTimeS = Animation.getWorldTime(mte.getWorld(), partialTicks);
         var animation = animations.get(mte.getAnimState());
-        if (animation != null) {
+        float epochS = mte.getAnimEpoch()/20f;
+        float time = worldTimeS - epochS;
+        if (animation != null && time >= 0) {
             animation.update(time);
         }
 

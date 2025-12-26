@@ -1,37 +1,33 @@
 package wfcore.api.metatileentity;
 
-import com.modularmods.mcgltf.IGltfModelReceiver;
-import com.modularmods.mcgltf.RenderedGltfModel;
-import com.modularmods.mcgltf.RenderedGltfScene;
-import com.modularmods.mcgltf.animation.GltfAnimationCreator;
-import com.modularmods.mcgltf.animation.InterpolatedChannel;
-import de.javagl.jgltf.model.AnimationModel;
 import gregtech.api.GregTechAPI;
 import gregtech.api.metatileentity.IFastRenderMetaTileEntity;
 import gregtech.api.metatileentity.MetaTileEntity;
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
-import wfcore.Tags;
 import wfcore.common.network.SPacketUpdateRenderMask;
 import wfcore.common.te.TERegistry;
 
-import java.util.*;
+import java.util.Collection;
 
 public interface IAnimatedMTE extends IFastRenderMetaTileEntity {
 
 
+    public default Vec3d getTransform() {
+        return Vec3d.ZERO;
+    }
 
-    public default Vec3d getTransform(){return Vec3d.ZERO;};
+    ;
 
     Collection<BlockPos> getHiddenBlocks();
 
-    public default String getAnimState(){
-       return "default";
+    public default String getAnimState() {
+        return "default";
     }
+    public long getAnimEpoch();
+
 
 
     @SuppressWarnings("unchecked")
@@ -57,7 +53,9 @@ public interface IAnimatedMTE extends IFastRenderMetaTileEntity {
         }
     }
 
-    public default boolean shouldRender(){return true;}
+    public default boolean shouldRender() {
+        return true;
+    }
 
     // If this returns true, the TESR will keep rendering even when the chunk is culled.
     @Override
@@ -68,7 +66,7 @@ public interface IAnimatedMTE extends IFastRenderMetaTileEntity {
     @Override
     default void renderMetaTileEntity(double x, double y, double z, float partialTicks) {
         if (thisObject().getWorld() == Minecraft.getMinecraft().world && shouldRender()) {
-            TERegistry.getRenderer(thisObject().getClass()).render(thisObject(), x,y,z,partialTicks);
+            TERegistry.getRenderer(thisObject().getClass()).render(thisObject(), x, y, z, partialTicks);
         }
 
     }
