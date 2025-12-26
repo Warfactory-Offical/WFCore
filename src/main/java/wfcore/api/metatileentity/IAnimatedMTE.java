@@ -28,6 +28,9 @@ public interface IAnimatedMTE extends IFastRenderMetaTileEntity {
 
     Collection<BlockPos> getHiddenBlocks();
 
+    public default String getAnimState(){
+       return "default";
+    }
 
 
     @SuppressWarnings("unchecked")

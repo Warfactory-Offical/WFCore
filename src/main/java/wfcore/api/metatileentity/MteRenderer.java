@@ -1,6 +1,11 @@
 package wfcore.api.metatileentity;
 
+import com.google.common.collect.ImmutableMap;
 import com.modularmods.mcgltf.IGltfModelReceiver;
+import com.modularmods.mcgltf.RenderedGltfModel;
+import com.modularmods.mcgltf.RenderedGltfScene;
+import com.modularmods.mcgltf.animation.GltfAnimationCreator;
+import de.javagl.jgltf.model.AnimationModel;
 import gregtech.api.metatileentity.MetaTileEntity;
 import gregtech.api.metatileentity.multiblock.MultiblockControllerBase;
 import gregtech.api.util.RelativeDirection;
@@ -8,9 +13,15 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.Vec3i;
 import org.lwjgl.opengl.GL11;
+import wfcore.common.render.AnimationLoop;
+
+import java.util.List;
 
 public abstract class MteRenderer<T extends MetaTileEntity & IAnimatedMTE> implements IGltfModelReceiver {
 
+    protected RenderedGltfScene renderedScene;
+
+    protected ImmutableMap<String, AnimationLoop> animations;
 
     public static void rotateToFace(EnumFacing face, EnumFacing spin) {
         int angle = spin == EnumFacing.EAST ? 90 : spin == EnumFacing.SOUTH ? 180 : spin == EnumFacing.WEST ? 270 : 0;
@@ -47,6 +58,16 @@ public abstract class MteRenderer<T extends MetaTileEntity & IAnimatedMTE> imple
         GlStateManager.scale(fX, fY, fZ);
     }
 
+    @Override
+    public void onReceiveSharedModel(RenderedGltfModel renderedModel) {
+        renderedScene = renderedModel.renderedGltfScenes.get(0);
+        List<AnimationModel> animationModels = renderedModel.gltfModel.getAnimationModels();
+        ImmutableMap.Builder<String, AnimationLoop> animations = ImmutableMap.builder();
+        for (AnimationModel animationModel : animationModels) {
+            animations.put(animationModel.getName(), new AnimationLoop(GltfAnimationCreator.createGltfAnimation(animationModel)));
+        }
+        this.animations = animations.build();
+    }
 
     protected void render(T mte, double x, double y, double z,
                           float partialTicks) {
@@ -81,6 +102,7 @@ public abstract class MteRenderer<T extends MetaTileEntity & IAnimatedMTE> imple
         GlStateManager.shadeModel(GL11.GL_FLAT);
         GlStateManager.popMatrix();
     }
+
 
     abstract public <T extends MetaTileEntity & IAnimatedMTE> void renderGLTF(T mte, float partialTicks);
 

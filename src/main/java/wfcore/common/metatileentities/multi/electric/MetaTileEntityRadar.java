@@ -252,7 +252,10 @@ public class MetaTileEntityRadar extends MultiblockWithDisplayBase implements IA
     public boolean shouldRender() {
         return isStructureFormed();
     }
-
+    @Override
+    public boolean allowsExtendedFacing() {
+        return false;
+    }
     @Override
     public Collection<BlockPos> getHiddenBlocks() {
         return new ArrayList<>();
