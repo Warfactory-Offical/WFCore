@@ -30,7 +30,7 @@ import static wfcore.api.util.LogUtil.logExceptionWithTrace;
 
 public class MultiblockRadarLogic {
     //TODO: Make those values adjustable in GUI
-    public int MIN_PTS = 15;
+    public int MIN_PTS = 4;
     public int EPS = 10;
 
     private int voltageTier;

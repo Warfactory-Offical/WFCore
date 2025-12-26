@@ -36,7 +36,7 @@ public class RenderRadar extends MteRenderer<MetaTileEntityRadar> {
     @Override
     public ResourceLocation getModelLocation() {
 
-        return new ResourceLocation(Tags.MODID, "model/radar.gltf");
+        return new ResourceLocation(Tags.MODID, "model/radar.glb");
     }
 
 
@@ -44,7 +44,7 @@ public class RenderRadar extends MteRenderer<MetaTileEntityRadar> {
     public <T extends MetaTileEntity & IAnimatedMTE> void renderGLTF(T mte, float partialTicks) {
         float time = Animation.getWorldTime(mte.getWorld(), partialTicks);
         for(List<InterpolatedChannel> animation : animations) {
-            animation.parallelStream().forEach((channel) -> {
+            animation.forEach((channel) -> {
                 float[] keys = channel.getKeys();
                 channel.update(time % keys[keys.length - 1]);
             });

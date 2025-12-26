@@ -52,15 +52,14 @@ public abstract class MteRenderer<T extends MetaTileEntity & IAnimatedMTE> imple
                           float partialTicks) {
         Vec3i vec3i = mte.getTransform();
         GlStateManager.pushMatrix();
-        GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
+        GlStateManager.shadeModel(GL11.GL_SMOOTH);
+        GlStateManager.enableRescaleNormal();
+        GlStateManager.enableBlend();
+        GlStateManager.blendFunc(
+                GlStateManager.SourceFactor.SRC_ALPHA,
+                GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA
+        );
         {
-            GlStateManager.shadeModel(GL11.GL_SMOOTH);
-            GlStateManager.enableRescaleNormal();
-            GlStateManager.enableBlend();
-            GlStateManager.blendFunc(
-                    GlStateManager.SourceFactor.SRC_ALPHA,
-                    GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA
-            );
 
 
             EnumFacing front = mte.getFrontFacing();
@@ -77,7 +76,9 @@ public abstract class MteRenderer<T extends MetaTileEntity & IAnimatedMTE> imple
             renderGLTF(mte, partialTicks);
 
         }
-        GL11.glPopAttrib();
+        GlStateManager.disableBlend();
+        GlStateManager.disableRescaleNormal();
+        GlStateManager.shadeModel(GL11.GL_FLAT);
         GlStateManager.popMatrix();
     }
 

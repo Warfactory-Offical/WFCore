@@ -36,6 +36,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.relauncher.Side;
@@ -61,8 +62,6 @@ public class MetaTileEntityRadar extends MultiblockWithDisplayBase implements IA
     protected IMultipleTankHandler outputFluidInventory;
     protected IEnergyContainer energyContainer;
 
-    protected RenderedGltfScene scene;
-    protected List<List<InterpolatedChannel>> animations;
 
     private long tickCounter = 0;
 
@@ -244,6 +243,15 @@ public class MetaTileEntityRadar extends MultiblockWithDisplayBase implements IA
         return bb;
     }
 
+    @Override
+    public Vec3i getTransform() {
+        return new Vec3i(0, 5, 0);
+    }
+
+    @Override
+    public boolean shouldRender() {
+        return isStructureFormed();
+    }
 
     @Override
     public Collection<BlockPos> getHiddenBlocks() {

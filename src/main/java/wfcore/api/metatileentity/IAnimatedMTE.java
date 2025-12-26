@@ -53,6 +53,8 @@ public interface IAnimatedMTE extends IFastRenderMetaTileEntity {
         }
     }
 
+    public default boolean shouldRender(){return true;}
+
     // If this returns true, the TESR will keep rendering even when the chunk is culled.
     @Override
     default boolean isGlobalRenderer() {
@@ -61,7 +63,7 @@ public interface IAnimatedMTE extends IFastRenderMetaTileEntity {
 
     @Override
     default void renderMetaTileEntity(double x, double y, double z, float partialTicks) {
-        if (thisObject().getWorld() == Minecraft.getMinecraft().world) {
+        if (thisObject().getWorld() == Minecraft.getMinecraft().world && shouldRender()) {
             TERegistry.getRenderer(thisObject().getClass()).render(thisObject(), x,y,z,partialTicks);
         }
 
