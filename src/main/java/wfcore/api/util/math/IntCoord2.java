@@ -1,9 +1,10 @@
-package wfcore.common.data;
-
+package wfcore.api.util.math;
 
 import net.minecraft.util.math.BlockPos;
 import org.apache.commons.math3.ml.clustering.Clusterable;
 
+//Simple integer tuple implementation, no point getting external Libraries involved
+// Implements clusterable for use in dbscan
 public class IntCoord2 implements Clusterable {
     private final int X, Z;
 
@@ -28,5 +29,10 @@ public class IntCoord2 implements Clusterable {
     @Override
     public double[] getPoint() {
         return new double[]{X, Z};
+    }
+
+    @Override
+    public String toString() {
+        return "(" + X + ", " + Z + ")";
     }
 }

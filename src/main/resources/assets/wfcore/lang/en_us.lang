@@ -4,6 +4,7 @@ gregtech.material.dirt=Dirt
 #Multiblocks
 wfcore.machine.projector.name=Projector
 wfcore.machine.projector.tooltip=The physical culmination of your journey has the power to tear the gods apart
+wfcore.machine.radar.name=Radar
 wfcore.machine.largesteamforgehammer.name=Large Steam Forge Hammer
 wfcore.machine.largesteamcompressor.name=Large Steam Compressor
 wfcore.machine.largesteamwasher.name=Large Steam Washer
@@ -38,6 +39,13 @@ item.material.oreprefix.wiredense=%s Dense Wire
 item.material.oreprefix.shell=%s Shell
 item.material.oreprefix.plateTriple=Cast %s Plate
 item.material.oreprefix.plateSextuple=Welded %s Plate
+
+# items
+item.radar_probe.name=Radar Debug Probe
+
+# info
+info.radar_probe.default=Used to show the names the radar will need to be supplied to target specific (tile) entities.
+info.radar_probe.advanced=The CASIO fx-9750GII is a cool programmable calculator
 
 # gommers shenanigans
 item.hbm.ingot_asbestos.name=Asbestos Ingot

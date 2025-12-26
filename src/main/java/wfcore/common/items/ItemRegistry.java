@@ -5,6 +5,7 @@ import net.minecraft.item.Item;
 import java.util.HashSet;
 import java.util.Set;
 
+@SuppressWarnings("unused")
 public class ItemRegistry {
 
     //Declare public static final items here
@@ -12,5 +13,7 @@ public class ItemRegistry {
 
     //Texture should be in assets/wfcore/textures/items
     public static final Item example = new BaseItem("screwdriver", "screwdriver_default");
+
+    public static final RadarProbe RADAR_PROBE = new RadarProbe("radar_probe", "radar_probe");
 
 }

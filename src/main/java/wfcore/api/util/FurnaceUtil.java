@@ -1,4 +1,4 @@
-package wfcore.common.util;
+package wfcore.api.util;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipes;
