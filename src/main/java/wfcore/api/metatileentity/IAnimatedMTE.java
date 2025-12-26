@@ -12,6 +12,7 @@ import gregtech.api.metatileentity.MetaTileEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import wfcore.Tags;
@@ -24,7 +25,7 @@ public interface IAnimatedMTE extends IFastRenderMetaTileEntity {
 
 
 
-    public default Vec3i getTransform(){return Vec3i.NULL_VECTOR;};
+    public default Vec3d getTransform(){return Vec3d.ZERO;};
 
     Collection<BlockPos> getHiddenBlocks();
 

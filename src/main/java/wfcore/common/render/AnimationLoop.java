@@ -11,7 +11,7 @@ public class AnimationLoop {
         public final List<InterpolatedChannel> animation;
 
         @Getter @Setter
-        private boolean loop = false;
+        private boolean loop = true;
 
         @Getter
         private boolean finished = false;

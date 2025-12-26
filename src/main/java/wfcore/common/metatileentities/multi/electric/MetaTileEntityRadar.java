@@ -36,6 +36,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
@@ -244,13 +245,19 @@ public class MetaTileEntityRadar extends MultiblockWithDisplayBase implements IA
     }
 
     @Override
-    public Vec3i getTransform() {
-        return new Vec3i(0, 5, 0);
+    public Vec3d getTransform() {
+        return new Vec3d(3.5, 9.5, 0);
     }
+
+    public String getAnimState(){
+        return "Idle";
+    }
+
 
     @Override
     public boolean shouldRender() {
-        return isStructureFormed();
+//        return isStructureFormed();
+        return true;
     }
     @Override
     public boolean allowsExtendedFacing() {

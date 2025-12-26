@@ -64,14 +64,15 @@ public abstract class MteRenderer<T extends MetaTileEntity & IAnimatedMTE> imple
         List<AnimationModel> animationModels = renderedModel.gltfModel.getAnimationModels();
         ImmutableMap.Builder<String, AnimationLoop> animations = ImmutableMap.builder();
         for (AnimationModel animationModel : animationModels) {
-            animations.put(animationModel.getName(), new AnimationLoop(GltfAnimationCreator.createGltfAnimation(animationModel)));
+            var rawAnim = new AnimationLoop(GltfAnimationCreator.createGltfAnimation(animationModel));
+            animations.put(animationModel.getName(),rawAnim);
         }
         this.animations = animations.build();
     }
 
     protected void render(T mte, double x, double y, double z,
                           float partialTicks) {
-        Vec3i vec3i = mte.getTransform();
+        var vec3d = mte.getTransform();
         GlStateManager.pushMatrix();
         GlStateManager.shadeModel(GL11.GL_SMOOTH);
         GlStateManager.enableRescaleNormal();
@@ -85,7 +86,7 @@ public abstract class MteRenderer<T extends MetaTileEntity & IAnimatedMTE> imple
 
             EnumFacing front = mte.getFrontFacing();
             GlStateManager.translate(x + 0.5, y + 0.5, z + 0.5);
-            GlStateManager.translate(vec3i.getX(), vec3i.getY(), vec3i.getZ());
+            GlStateManager.translate(vec3d.x, vec3d.y, vec3d.z);
 
             if (mte instanceof MultiblockControllerBase controller) {
                 EnumFacing upwards = controller.getUpwardsFacing();
