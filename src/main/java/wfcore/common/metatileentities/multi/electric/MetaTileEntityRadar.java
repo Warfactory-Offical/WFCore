@@ -1,6 +1,8 @@
 package wfcore.common.metatileentities.multi.electric;
-;
+
 import com.google.common.collect.Lists;
+import com.modularmods.mcgltf.RenderedGltfScene;
+import com.modularmods.mcgltf.animation.InterpolatedChannel;
 import gregtech.api.capability.IEnergyContainer;
 import gregtech.api.capability.IMultipleTankHandler;
 import gregtech.api.capability.IObjectHolder;
@@ -23,33 +25,34 @@ import gregtech.api.metatileentity.multiblock.MultiblockWithDisplayBase;
 import gregtech.api.pattern.BlockPattern;
 import gregtech.api.pattern.FactoryBlockPattern;
 import gregtech.api.pattern.PatternMatchContext;
-import gregtech.api.unification.material.Materials;
 import gregtech.api.util.GTUtility;
 import gregtech.api.util.RelativeDirection;
 import gregtech.api.util.TextComponentUtil;
 import gregtech.client.renderer.ICubeRenderer;
 import gregtech.client.renderer.texture.Textures;
-import gregtech.common.ConfigHolder;
 import gregtech.common.blocks.BlockMachineCasing;
-import gregtech.common.blocks.BlockMetalCasing;
 import gregtech.common.blocks.MetaBlocks;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
-import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import org.jetbrains.annotations.NotNull;
+import wfcore.api.metatileentity.IAnimatedMTE;
 import wfcore.api.radar.MultiblockRadarLogic;
 import wfcore.api.util.math.ClusterData;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
-public class MetaTileEntityRadar extends MultiblockWithDisplayBase {
+;
+
+public class MetaTileEntityRadar extends MultiblockWithDisplayBase implements IAnimatedMTE {
     private final MultiblockRadarLogic logic = new MultiblockRadarLogic(this);  // this should be created/modified whenever structure is formed/modified
 
     protected IItemHandlerModifiable inputInventory;
@@ -57,6 +60,9 @@ public class MetaTileEntityRadar extends MultiblockWithDisplayBase {
     protected IMultipleTankHandler inputFluidInventory;
     protected IMultipleTankHandler outputFluidInventory;
     protected IEnergyContainer energyContainer;
+
+    protected RenderedGltfScene scene;
+    protected List<List<InterpolatedChannel>> animations;
 
     private long tickCounter = 0;
 
@@ -91,7 +97,7 @@ public class MetaTileEntityRadar extends MultiblockWithDisplayBase {
                         .or(abilities(MultiblockAbility.INPUT_ENERGY)
                                 .setMinGlobalLimited(1))
                         .or(this.maintenancePredicate())
-                                .setExactLimit(1))
+                        .setExactLimit(1))
                 .build();
     }
 
@@ -109,7 +115,9 @@ public class MetaTileEntityRadar extends MultiblockWithDisplayBase {
     @Override
     public void update() {
         // ignore clients
-        if (this.getWorld().isRemote) { return; }
+        if (this.getWorld().isRemote) {
+            return;
+        }
 
         // update tick counter
         ++tickCounter;
@@ -146,7 +154,9 @@ public class MetaTileEntityRadar extends MultiblockWithDisplayBase {
     }
 
     public int getTier() {
-        if (energyContainer == null) { return -1; }
+        if (energyContainer == null) {
+            return -1;
+        }
 
         return GTUtility.getTierByVoltage(energyContainer.getInputVoltage());
     }
@@ -221,4 +231,22 @@ public class MetaTileEntityRadar extends MultiblockWithDisplayBase {
         return builder;
     }
 
+
+    @Override
+    public AxisAlignedBB getRenderBoundingBox() {
+        BlockPos p = getPos();
+        AxisAlignedBB bb = new AxisAlignedBB(
+                p.getX() - 10, p.getY(),
+                p.getZ() - 10,
+                p.getX() + 10, p.getY() + 1,
+                p.getZ() + 10
+        );
+        return bb;
+    }
+
+
+    @Override
+    public Collection<BlockPos> getHiddenBlocks() {
+        return new ArrayList<>();
+    }
 }

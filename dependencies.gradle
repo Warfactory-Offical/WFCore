@@ -45,6 +45,7 @@ dependencies {
 
 
     implementation 'codechicken:codechickenlib:3.2.3.358' transitive false
+    implementation rfg.deobf("curse.maven:mcgltf-591547:4367036")
     implementation 'gregtech:gregtech:2.8.10-beta' transitive false
     implementation 'gregicality:GregicalityMultiblocks:1.2.11' transitive false
     api "com.cleanroommc:modularui:3.0.5" transitive false
