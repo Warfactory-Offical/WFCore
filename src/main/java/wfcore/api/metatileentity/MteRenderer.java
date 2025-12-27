@@ -10,8 +10,8 @@ import gregtech.api.metatileentity.MetaTileEntity;
 import gregtech.api.metatileentity.multiblock.MultiblockControllerBase;
 import gregtech.api.util.RelativeDirection;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.util.EnumFacing;
-import org.lwjgl.opengl.GL11;
 import wfcore.common.render.AnimationLoop;
 
 import java.util.List;
@@ -102,6 +102,12 @@ public abstract class MteRenderer<T extends MetaTileEntity & IAnimatedMTE> imple
         GlStateManager.scale(fX, fY, fZ);
     }
 
+    public static void setupLight(int light) {
+        int lx = light % 0x10000;
+        int ly = light / 0x10000;
+        OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, lx, ly);
+    }
+
     /**
      * Called when the GLTF model and animations are ready on the client.
      * <p>
@@ -147,31 +153,31 @@ public abstract class MteRenderer<T extends MetaTileEntity & IAnimatedMTE> imple
     protected void render(T mte, double x, double y, double z, float partialTicks) {
         var vec3d = mte.getTransform();
         GlStateManager.pushMatrix();
-        GlStateManager.shadeModel(GL11.GL_SMOOTH);
         GlStateManager.enableRescaleNormal();
-        GlStateManager.enableBlend();
-        GlStateManager.blendFunc(
-                GlStateManager.SourceFactor.SRC_ALPHA,
-                GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA
-        );
+        GlStateManager.disableLighting();
+        {
 
-        EnumFacing front = mte.getFrontFacing();
-        GlStateManager.translate(x + 0.5, y + 0.5, z + 0.5);
-        GlStateManager.translate(vec3d.x, vec3d.y, vec3d.z);
 
-        if (mte instanceof MultiblockControllerBase controller) {
-            EnumFacing upwards = controller.getUpwardsFacing();
-            EnumFacing left = RelativeDirection.LEFT.getRelativeFacing(front, upwards, controller.isFlipped());
 
-            if (controller.isFlipped()) flip(left);
-            rotateToFace(front, upwards);
+            setupLight(mte.getWorld().getCombinedLight(mte.getLightPos(), 0));
+
+            EnumFacing front = mte.getFrontFacing();
+            GlStateManager.translate(x + 0.5, y + 0.5, z + 0.5);
+            GlStateManager.translate(vec3d.x, vec3d.y, vec3d.z);
+
+            if (mte instanceof MultiblockControllerBase controller) {
+                EnumFacing upwards = controller.getUpwardsFacing();
+                EnumFacing left = RelativeDirection.LEFT.getRelativeFacing(front, upwards, controller.isFlipped());
+
+                if (controller.isFlipped()) flip(left);
+                rotateToFace(front, upwards);
+            }
+
+            renderGLTF(mte, partialTicks);
+
         }
-
-        renderGLTF(mte, partialTicks);
-
-        GlStateManager.disableBlend();
+        GlStateManager.enableLighting();
         GlStateManager.disableRescaleNormal();
-        GlStateManager.shadeModel(GL11.GL_FLAT);
         GlStateManager.popMatrix();
     }
 

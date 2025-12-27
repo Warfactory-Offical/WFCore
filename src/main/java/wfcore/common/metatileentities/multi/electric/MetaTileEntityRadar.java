@@ -250,6 +250,9 @@ public class MetaTileEntityRadar extends MultiblockWithDisplayBase implements IA
         return new Vec3d(3.5, 9.5, 0);
     }
 
+    public BlockPos getLightPos() {
+        return thisObject().getPos().up(15);
+    }
     @Getter
     String animState = "idle";
     @Getter

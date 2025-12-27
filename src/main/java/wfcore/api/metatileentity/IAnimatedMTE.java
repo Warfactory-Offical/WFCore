@@ -34,6 +34,10 @@ public interface IAnimatedMTE extends IFastRenderMetaTileEntity {
         return Vec3d.ZERO;
     }
 
+
+    default BlockPos getLightPos() {
+        return thisObject().getPos();
+    }
     /**
      * Returns the collection of block positions that should be hidden when rendering this tile entity.
      * Useful for multiblocks where internal components should not be drawn.
@@ -47,6 +51,7 @@ public interface IAnimatedMTE extends IFastRenderMetaTileEntity {
      * <p>
      * Used to select which AnimationLoop to play in the renderer.
      * Default is "default".
+     *
      *
      * @return the current animation state
      */
@@ -90,6 +95,7 @@ public interface IAnimatedMTE extends IFastRenderMetaTileEntity {
      * <p>
      * Sends a packet to all clients in the dimension to hide or show
      * blocks returned by {@link #getHiddenBlocks()}.
+     * Blocks are hidden by being excluded from the chunk VBO
      * <b>Server-side only.</b>
      *
      * @param disable true to hide blocks, false to show
@@ -107,7 +113,8 @@ public interface IAnimatedMTE extends IFastRenderMetaTileEntity {
     /**
      * Determines whether this tile entity should be rendered.
      * <p>
-     * Used to conditionally skip rendering for client-side optimization.
+     * Used to conditionally skip rendering for client-side optimization
+     * and to indicate whenever multiblock is formed
      *
      * @return true if this tile entity should be rendered, false otherwise
      */

@@ -1,4 +1,4 @@
-package wfcore.mixins.vanilla;
+package wfcore.mixins.minecraft;
 
 import net.minecraft.util.CombatRules;
 import net.minecraft.util.math.MathHelper;
