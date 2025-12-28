@@ -1,18 +1,26 @@
 package wfcore.common.recipe;
 
 import com.hbm.blocks.ModBlocks;
+import com.hbm.blocks.generic.BlockFlammable;
 import com.hbm.items.ModItems;
 import gregtech.api.GTValues;
+import gregtech.api.items.metaitem.MetaItem;
+import gregtech.common.blocks.BlockMetalCasing;
+import gregtech.common.blocks.MetaBlocks;
+import gregtech.common.items.MetaItem1;
 import gregtech.common.items.MetaItems;
 import gregtech.common.metatileentities.MetaTileEntities;
 import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 import net.minecraftforge.registries.ForgeRegistry;
 import org.jetbrains.annotations.NotNull;
@@ -35,6 +43,7 @@ public class VanillaRecipes {
 
     public static void registerCTRecipes(RegistryEvent.Register<IRecipe> event) {
         ForgeRegistry<IRecipe> registry = (ForgeRegistry<IRecipe>) event.getRegistry();
+        
 //Steam Age machines
         registry.remove(new ResourceLocation(RefStrings.HBM, "machine_ammo_press"));
 
@@ -80,8 +89,6 @@ public class VanillaRecipes {
                 "on");
 
         //soldering station
-
-        //registry.remove(new ResourceLocation(RefStrings.HBM, "machine_soldering_station"));
 
         //registers GT ULV hull as an Itemstack to use in 3x3 crafting
         ItemStack ulvHull = MetaTileEntities.HULL[GTValues.ULV].getStackForm();
@@ -215,8 +222,63 @@ public class VanillaRecipes {
         registry.remove(new ResourceLocation(RefStrings.HBM, "plate_polymer_5"));
         registry.remove(new ResourceLocation(RefStrings.HBM, "plate_polymer_4"));
 
+        registry.remove(new ResourceLocation(RefStrings.GT, "electronic_circuit_lv"));
+
+
+// rubber w/o sulfur
+
+
+        ItemStack rubberIngot = new ItemStack(ForgeRegistries.ITEMS.getValue(new ResourceLocation("gregtech:meta_ingot")), 1, 1068);
+        ItemStack rawRubber = new ItemStack(ForgeRegistries.ITEMS.getValue(new ResourceLocation("gregtech:meta_dust")), 1, 1002);
+        ItemStack Hammer = new ItemStack(ForgeRegistries.ITEMS.getValue(new ResourceLocation("gregtech:hammer")), 1);
+        new VanillaRecipes.ShapedOreRecSelfReg(
+                new ResourceLocation(MODID, "rubber_ingot"),
+                rubberIngot.copy(),
+
+
+                " H ",
+                " R ",
+                " R ",
+                'H', Hammer,
+                'R', rawRubber
+
+
+        ).setRegistryName(MODID, "rubber_ingot_hammer");
+
+
+//PBF recipe chain
+
+
+        ItemStack firebrick = MetaItems.FIRECLAY_BRICK.getStackForm();
+        ItemStack castCopper = ModItems.plate_copper.getDefaultInstance();
+        ItemStack screwItem = new ItemStack(ForgeRegistries.ITEMS.getValue(new ResourceLocation("gregtech:meta_screw")), 1, 260);
+
+
+        ItemStack PBFbrick = MetaBlocks.METAL_CASING.getItemVariant(BlockMetalCasing.MetalCasingType.PRIMITIVE_BRICKS, 3);
+
+
+        registry.remove(new ResourceLocation(RefStrings.GT, "casing_primitive_bricks"));
+
+
+        new ShapedOreRecSelfReg(
+                new ResourceLocation(MODID, "casing_primitive_bricks"),
+                PBFbrick.copy(),
+
+
+                "WSW",
+                "SCS",
+                "WSW",
+                'C', castCopper,
+                'W', firebrick,
+                'S', screwItem
+        ).setRegistryName(MODID, "casing_primitive_bricks");
+
+
+
+
         // LV Recipes
         // registry.remove(new ResourceLocation(RefStrings.HBM, "machine_stirling_steel"));
+        
 
         registry.remove(new ResourceLocation(RefStrings.HBM, "gear_large_1"));
 

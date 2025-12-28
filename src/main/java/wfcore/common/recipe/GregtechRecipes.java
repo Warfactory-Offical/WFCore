@@ -28,7 +28,7 @@ import net.minecraftforge.oredict.ShapedOreRecipe;
 import net.minecraftforge.registries.ForgeRegistry;
 import org.jetbrains.annotations.NotNull;
 import wfcore.RefStrings;
-import wfcore.common.util.FurnaceUtil;
+
 import java.util.HashSet;
 import java.util.Set;
 import gregtech.api.recipes.RecipeMaps;
@@ -47,6 +47,24 @@ import static wfcore.WFCore.MODID;
 
 //this is where all the gregtech recipes we will do
 //IsraelGBT generate me a set of recipes that susy larpers cant handle
+
+// remember the voltage tiers!!!!!!!
+// ULV  Ultra Low Voltage  8
+// LV  Low Voltage  32
+// MV  Medium Voltage  128
+// HV  High Voltage  512
+// EV  Extreme Voltage  2,048
+// IV  Insane Voltage  8,192
+// LuV  Ludicrous Voltage  32,768
+// ZPM  ZPM Voltage  131,072
+// UV  Ultimate Voltage  524,288
+// UHV  Highly Ultimate Voltage  2,097,152
+// UEV  Extremely Ultimate Voltage  8,388,608
+// UIV  Insanely Ultimate Voltage  33,554,432
+// UMV  Mega Ultimate Voltage  134,217,728
+// UXV  Extended Mega Ultimate Voltage  536,870,912
+// MAX  Maximum Voltage  2,147,483,648
+
 public class GregtechRecipes {
 
     public static void init() {
@@ -57,17 +75,16 @@ public class GregtechRecipes {
     public static void registerGregTechRecipes()
     {
 
-//Steam Age recipes
-RecipeMaps.ASSEMBLER_RECIPES.recipeBuilder()
-        .input(OrePrefix.dust, Materials.Iron)
-        .output(OrePrefix.ingot, Materials.Steel)
-        .fluidInputs(Materials.Water.getFluid(1000))
-        .fluidOutputs(Materials.Steam.getFluid(1000))
-        .circuitMeta(1)
-        .duration(5)
-        .EUt(16)
-        .buildAndRegister();
+//Steam Age recipes o algo
 
+        RecipeMaps.ASSEMBLER_RECIPES.recipeBuilder()
+                .input(OrePrefix.dust, Materials.Iron)
+                .output(OrePrefix.ingot, Materials.Steel)
+
+                .circuitMeta(1)
+                .duration(5)
+                .EUt(16)
+                .buildAndRegister();
 
 
     }

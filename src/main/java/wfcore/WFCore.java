@@ -1,15 +1,25 @@
 package wfcore;
 
-import net.minecraftforge.event.entity.EntityEvent;
-import net.minecraftforge.event.world.BlockEvent;
+import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
+import net.minecraft.item.Item;
+import net.minecraft.item.crafting.IRecipe;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.SidedProxy;
+import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.*;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.relauncher.Side;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import wfcore.api.radar.MultiblockRadarLogic;
 import wfcore.common.proxy.CommonProxy;
+import wfcore.common.recipe.GregtechRecipes;
+import wfcore.common.recipe.HBMRecepies;
+import wfcore.common.recipe.VanillaRecipes;
+import wfcore.common.recipe.chain.LargeBlastFurnace;
+import wfcore.common.recipe.chain.SteamWiremillRecipes;
 
 @Mod(modid = Tags.MODID, version = Tags.VERSION, name = Tags.MODNAME, acceptedMinecraftVersions = "[1.12.2]",
         dependencies = "after:hbm"
@@ -18,61 +28,60 @@ public class WFCore {
 
     public static final Logger LOGGER = LogManager.getLogger(Tags.MODID);
     public static final String MODID = "wfcore";
-    public static final boolean DEBUG = true;
+    public static final boolean DEBUG = false;
 
-    @SidedProxy(
-            clientSide = "wfcore.common.proxy.ClientProxy",
-            serverSide = "wfcore.common.proxy.CommonProxy"
-    )
     public static CommonProxy proxy;
 
-    @Mod.EventHandler
+    @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
-        proxy.preInit(event);
-
-        // read the radar config file
-        MultiblockRadarLogic.readRadarConfig();
+        MinecraftForge.EVENT_BUS.register(this);
     }
 
-    @Mod.EventHandler
+
+    @SubscribeEvent
+    // Register recipes here (Remove if not needed)
+    public void registerRecipes(RegistryEvent.Register<IRecipe> event) {
+        SteamWiremillRecipes.init();
+        LargeBlastFurnace.init();
+        VanillaRecipes.registerCTRecipes(event);
+        VanillaRecipes.registerFurnaceRecipes(event);
+        GregtechRecipes.registerGregTechRecipes();
+
+    }
+
+
+    @SubscribeEvent
+    // Register items here (Remove if not needed)
+    public void registerItems(RegistryEvent.Register<Item> event) {
+
+    }
+
+    @SubscribeEvent
+    // Register blocks here (Remove if not needed)
+    public void registerBlocks(RegistryEvent.Register<Block> event) {
+
+    }
+
+    @EventHandler
+    // load "Do your mod setup. Build whatever data structures you care about." (Remove if not needed)
     public void init(FMLInitializationEvent event) {
-        proxy.init(event);
     }
 
-    @Mod.EventHandler
-    public void loadComplete(FMLLoadCompleteEvent event) {
-        proxy.loadComplete(event);
+    @EventHandler
+    public void init(FMLLoadCompleteEvent event) {
+        if(FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT)
+            HBMRecepies.init(event);
     }
 
-    @Mod.EventHandler
+    @EventHandler
+    // postInit "Handle interaction with other mods, complete your setup based on this." (Remove if not needed)
     public void postInit(FMLPostInitializationEvent event) {
-        proxy.postInit(event);
-
-        // all items and blocks from other mods have been loaded in post init, try to get blocks to target
     }
 
-    @Mod.EventHandler
+    @EventHandler
+    // register server commands in this event handler (Remove if not needed)
     public void serverStarting(FMLServerStartingEvent event) {
-        proxy.serverStarting(event);
     }
 
-    // we need may want to check blocks after they are placed to track them
-    @SubscribeEvent
-    public void blockPlaced(BlockEvent.EntityPlaceEvent event) {
-        // only handle on server
-        if (event.getWorld().isRemote) {
-            return;
-        }
 
-
-    }
-
-    // we may want to inspect all entities when they are created
-    @SubscribeEvent
-    public void entityConstructing(EntityEvent.EntityConstructing event) {
-        // only handle on server
-        if (event.getEntity().getEntityWorld().isRemote) {
-            return;
-        }
-    }
 }
