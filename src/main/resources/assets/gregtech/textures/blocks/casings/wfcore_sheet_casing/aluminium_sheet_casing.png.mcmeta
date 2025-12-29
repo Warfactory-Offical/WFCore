@@ -1,0 +1,9 @@
+{
+  "ctm": {
+    "ctm_version": 1,
+    "type": "ctm",
+    "textures": [
+      "gregtech:blocks/casings/wfcore_sheet_casing/aluminium_sheet_casing_ctm"
+      ]
+  }
+}

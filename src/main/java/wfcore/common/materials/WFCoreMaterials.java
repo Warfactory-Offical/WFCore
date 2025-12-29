@@ -1,8 +1,20 @@
 package wfcore.common.materials;
 
+import gregtech.api.GTValues;
+import gregtech.api.fluids.FluidBuilder;
 import gregtech.api.unification.material.Material;
+import gregtech.api.unification.material.properties.BlastProperty;
 
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import static gregtech.api.GTValues.HV;
+import static gregtech.api.GTValues.VA;
+import static gregtech.api.unification.material.Materials.STD_METAL;
+import static gregtech.api.unification.material.info.MaterialFlags.*;
+import static gregtech.api.unification.material.info.MaterialFlags.GENERATE_DOUBLE_PLATE;
+import static gregtech.api.unification.material.info.MaterialIconSet.METALLIC;
+import static gregtech.api.util.GTUtility.gregtechId;
 
 public class WFCoreMaterials {
     private static final AtomicBoolean INIT = new AtomicBoolean(false);
@@ -12,17 +24,22 @@ public class WFCoreMaterials {
     public static Material Schrabidium;
     public static Material Unobtainium;
     public static Material CMBSteel;
-    public static Material Neoveline;
     public static Material Verticium;
+    public static Material GalvanizedSteel;
 
     public static void register() {
+
+        var atomicID = new AtomicInteger(800);
+
         if (INIT.getAndSet(true)) {
             return;
         }
 
 
         FirstDegreeMaterials.register();
-        HbmMaterials.register();
+        HbmMaterials.register(atomicID);
+        registerWFMaterials(atomicID);
+
         /*
          * FOR ADDON DEVELOPERS:
          *
@@ -42,6 +59,21 @@ public class WFCoreMaterials {
          * - FREE RANGE 24000-31999
          * - Reserved for CraftTweaker: 32000-32767
          */
+
+    }
+
+
+    public static void registerWFMaterials(AtomicInteger id){
+        GalvanizedSteel = new Material.Builder(id.getAndAdd(1), gregtechId("Galvanized_Steel"))
+                .cableProperties(GTValues.V[GTValues.MV], 4, 0, true)
+                .color(0xa4a4a4).ingot()
+                .liquid(new FluidBuilder().temperature(1373))
+                .iconSet(METALLIC)
+                .flags(STD_METAL, GENERATE_LONG_ROD, GENERATE_FRAME,
+                        GENERATE_DOUBLE_PLATE)
+                .fluidPipeProperties(1200, 40, true)
+                .blast(b -> b.temp(2700, BlastProperty.GasTier.LOW).blastStats(VA[HV], 200))
+                .build();
 
     }
 

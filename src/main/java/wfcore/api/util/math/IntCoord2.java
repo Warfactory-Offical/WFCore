@@ -1,5 +1,6 @@
 package wfcore.api.util.math;
 
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.BlockPos;
 import org.apache.commons.math3.ml.clustering.Clusterable;
 
@@ -34,5 +35,16 @@ public class IntCoord2 implements Clusterable {
     @Override
     public String toString() {
         return "(" + X + ", " + Z + ")";
+    }
+
+    public NBTTagCompound toNBT() {
+        var nbt = new NBTTagCompound();
+        nbt.setInteger("cx", X);
+        nbt.setInteger("cz", Z);
+        return nbt;
+    }
+
+    public static IntCoord2 fromNBT(NBTTagCompound nbt) {
+        return new IntCoord2(nbt.getInteger("cx"), nbt.getInteger("cz"));
     }
 }

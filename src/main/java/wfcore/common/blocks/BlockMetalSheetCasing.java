@@ -1,5 +1,6 @@
 package wfcore.common.blocks;
 
+import gregtech.api.GregTechAPI;
 import gregtech.api.block.IStateHarvestLevel;
 import gregtech.api.block.VariantBlock;
 import gregtech.api.items.toolitem.ToolClasses;
@@ -12,16 +13,19 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import org.jetbrains.annotations.NotNull;
 
-public class BlockWFMetalCasing extends VariantBlock<gregtech.common.blocks.BlockMetalCasing.MetalCasingType> {
 
-    public BlockWFMetalCasing() {
+public class BlockMetalSheetCasing extends VariantBlock<BlockMetalSheetCasing.MetalSheetCasingType> {
+
+    public BlockMetalSheetCasing(String name) {
         super(Material.IRON);
-        setTranslationKey("metal_casing");
+        setTranslationKey(name);
+        setRegistryName(name);
         setHardness(5.0f);
         setResistance(10.0f);
         setSoundType(SoundType.METAL);
-        setDefaultState(getState(gregtech.common.blocks.BlockMetalCasing.MetalCasingType.BRONZE_BRICKS));
+        BlockRegistry.BLOCKS.add(this);
     }
+
 
     @Override
     public boolean canCreatureSpawn(@NotNull IBlockState state, @NotNull IBlockAccess world, @NotNull BlockPos pos,
@@ -29,15 +33,14 @@ public class BlockWFMetalCasing extends VariantBlock<gregtech.common.blocks.Bloc
         return false;
     }
 
-    public enum MetalCasingType implements IStringSerializable, IStateHarvestLevel {
+    public enum MetalSheetCasingType implements IStringSerializable, IStateHarvestLevel {
 
-        BRONZE_BRICKS("bronze_bricks", 1);
-
+        ALUMINIUM_SHEET_CASING("aluminum_sheet", 2);
 
         private final String name;
         private final int harvestLevel;
 
-        MetalCasingType(String name, int harvestLevel) {
+        MetalSheetCasingType(String name, int harvestLevel) {
             this.name = name;
             this.harvestLevel = harvestLevel;
         }
