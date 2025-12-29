@@ -247,7 +247,7 @@ public class MetaTileEntityRadar extends MultiblockWithDisplayBase implements IA
 
     @Override
     public Vec3d getTransform() {
-        return new Vec3d(3.5, 9.5, 0);
+        return new Vec3d(4, 10, 0);
     }
 
     public BlockPos getLightPos() {

@@ -1,0 +1,23 @@
+{
+  "forge_marker" : 1,
+  "defaults" : {
+    "model" : "minecraft:cube_all",
+    "textures" : {
+      "all" : "gregtech:blocks/casings/wfcore_boltable/coated_beryllium_casing"
+    }
+  },
+  "variants" : {
+    "variant=boron_coated" : {
+      "model" : "minecraft:cube_all",
+      "textures" : {
+        "all" : "gregtech:blocks/casings/wfcore_boltable/coated_beryllium_casing"
+      }
+    },
+    "variant=boron_coated_bolted" : {
+      "model" : "minecraft:cube_all",
+      "textures" : {
+        "all" : "gregtech:blocks/casings/wfcore_boltable/coated_beryllium_casing_bolted"
+      }
+    }
+  }
+}

@@ -11,7 +11,9 @@ import gregtech.api.metatileentity.multiblock.MultiblockControllerBase;
 import gregtech.api.util.RelativeDirection;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
+import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.util.EnumFacing;
+import org.lwjgl.opengl.GL11;
 import wfcore.common.render.AnimationLoop;
 
 import java.util.List;
@@ -154,7 +156,8 @@ public abstract class MteRenderer<T extends MetaTileEntity & IAnimatedMTE> imple
         var vec3d = mte.getTransform();
         GlStateManager.pushMatrix();
         GlStateManager.enableRescaleNormal();
-        GlStateManager.disableLighting();
+        GlStateManager.shadeModel(GL11.GL_SMOOTH);
+        GlStateManager.colorMaterial(1032, 5634);
         {
 
 
@@ -162,7 +165,7 @@ public abstract class MteRenderer<T extends MetaTileEntity & IAnimatedMTE> imple
             setupLight(mte.getWorld().getCombinedLight(mte.getLightPos(), 0));
 
             EnumFacing front = mte.getFrontFacing();
-            GlStateManager.translate(x + 0.5, y + 0.5, z + 0.5);
+            GlStateManager.translate(x, y, z );
             GlStateManager.translate(vec3d.x, vec3d.y, vec3d.z);
 
             if (mte instanceof MultiblockControllerBase controller) {
@@ -176,8 +179,9 @@ public abstract class MteRenderer<T extends MetaTileEntity & IAnimatedMTE> imple
             renderGLTF(mte, partialTicks);
 
         }
-        GlStateManager.enableLighting();
+
         GlStateManager.disableRescaleNormal();
+
         GlStateManager.popMatrix();
     }
 

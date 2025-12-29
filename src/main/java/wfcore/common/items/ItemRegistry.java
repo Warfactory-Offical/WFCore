@@ -1,9 +1,17 @@
 package wfcore.common.items;
 
+import gregtech.api.block.VariantBlock;
+import gregtech.api.block.VariantItemBlock;
+import net.minecraft.block.Block;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemBlock;
+import net.minecraft.util.IStringSerializable;
 
 import java.util.HashSet;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 
 @SuppressWarnings("unused")
 public class ItemRegistry {
@@ -15,5 +23,19 @@ public class ItemRegistry {
     public static final Item example = new BaseItem("screwdriver", "screwdriver_default");
 
     public static final RadarProbe RADAR_PROBE = new RadarProbe("radar_probe", "radar_probe");
+
+
+    public static Optional<ItemBlock> createItemBlock(Block block, Function<Block, ItemBlock> producer) {
+        if(producer == null) return Optional.empty();
+        ItemBlock itemBlock = producer.apply(block);
+        itemBlock.setRegistryName(Objects.requireNonNull(block.getRegistryName()));
+        return Optional.of(itemBlock);
+    }
+
+    public static ItemBlock createVariantItemBlockUnchecked(VariantBlock<?> block) {
+        return new VariantItemBlock(block);
+    }
+
+
 
 }
