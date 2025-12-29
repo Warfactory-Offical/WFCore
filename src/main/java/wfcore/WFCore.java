@@ -12,7 +12,7 @@ import wfcore.api.radar.MultiblockRadarLogic;
 import wfcore.common.proxy.CommonProxy;
 
 @Mod(modid = Tags.MODID, version = Tags.VERSION, name = Tags.MODNAME, acceptedMinecraftVersions = "[1.12.2]",
-        dependencies = "after:hbm"
+        dependencies = "after:hbm;after:mcheli;required:gregtech;required-after-client:mcgltf;required-client:ctm"
 )
 public class WFCore {
 

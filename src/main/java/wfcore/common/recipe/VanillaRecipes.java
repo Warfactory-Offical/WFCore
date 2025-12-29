@@ -1,11 +1,15 @@
 package wfcore.common.recipe;
 
 import com.hbm.blocks.ModBlocks;
+import com.hbm.blocks.generic.BlockMeta;
 import com.hbm.items.ModItems;
 import gregtech.api.GTValues;
+import gregtech.common.blocks.BlockMetalCasing;
+import gregtech.common.blocks.MetaBlocks;
 import gregtech.common.items.MetaItems;
 import gregtech.common.metatileentities.MetaTileEntities;
 import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -220,6 +224,20 @@ public class VanillaRecipes {
 
         registry.remove(new ResourceLocation(RefStrings.HBM, "gear_large_1"));
 
+
+        registry.remove(new ResourceLocation(RefStrings.GT, "casing_primitive_bricks"));
+
+        new ShapedOreRecSelfReg(
+                new ResourceLocation(MODID, "casing_primitive_bricks"),
+                MetaBlocks.METAL_CASING.getItemVariant(BlockMetalCasing.MetalCasingType.PRIMITIVE_BRICKS).copy(),
+
+                "WBW",
+                "BCB",
+                "WBW",
+                'C', "gearBronze",
+                'B', "stickBronze",
+                'W', "plateInvar"
+        ).setRegistryName(MODID, "casing_primitive_bricks");
         RECIPES.forEach(registry::register);
 
     }

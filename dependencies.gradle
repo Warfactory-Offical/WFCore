@@ -45,6 +45,7 @@ dependencies {
 
 
     implementation 'codechicken:codechickenlib:3.2.3.358' transitive false
+    implementation rfg.deobf("curse.maven:mcgltf-591547:4367036")
     implementation 'gregtech:gregtech:2.8.10-beta' transitive false
     implementation 'gregicality:GregicalityMultiblocks:1.2.11' transitive false
     api "com.cleanroommc:modularui:3.0.5" transitive false
@@ -52,10 +53,11 @@ dependencies {
 
 
     //WF mods
-    implementation rfg.deobf("curse.maven:hbm-nuclear-tech-mod-community-edition-1312314:7327936")
+    implementation rfg.deobf("curse.maven:hbm-nuclear-tech-mod-community-edition-1312314:7374941")
     implementation rfg.deobf("curse.maven:mchce-1383222:7241614")
 
     implementation rfg.deobf("curse.maven:ctm-267602:2915363")
+    runtimeOnly rfg.deobf("curse.maven:building-gadgets-298187:3005950")
 
 //    implementation rfg.deobf("curse.maven:groovyscript-687577:4991701") // GRS 0.7.3
 

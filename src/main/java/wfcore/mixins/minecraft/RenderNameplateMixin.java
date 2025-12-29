@@ -1,4 +1,4 @@
-package wfcore.mixins.vanilla;
+package wfcore.mixins.minecraft;
 
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.BufferBuilder;

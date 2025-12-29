@@ -1,0 +1,9 @@
+{
+	"ctm": {
+		"ctm_version": 1,
+		"type": "CTM",
+		"textures": [
+			"gregtech:blocks/casings/wfcore_boltable/coated_beryllium_casing_bolted_ctm"
+		]
+	}
+}

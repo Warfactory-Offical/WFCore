@@ -1,0 +1,19 @@
+{
+  "package": "wfcore.mixins.minecraft",
+  "refmap": "mixins.wfcore.refmap.json",
+  "target": "@env(DEFAULT)",
+  "minVersion": "0.8",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+    "CombatRulesMixin"
+  ],
+  "client": [
+    "DebugRemover",
+    "RenderLivingLabelMixin",
+    "RenderNameplateMixin",
+    "GuiDebugRemover",
+    "TileEntityRendererDispatcherMixin",
+    "RenderChunkMixin",
+    "BlockModelRendererMixin"
+  ]
+}

@@ -9,6 +9,8 @@ import gregtech.api.unification.material.properties.IngotProperty;
 import gregtech.api.unification.material.properties.PropertyKey;
 import wfcore.api.material.info.WFCoreMaterialFlags;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import static gregtech.api.GTValues.*;
 import static gregtech.api.unification.material.Materials.*;
 import static gregtech.api.unification.material.info.MaterialFlags.*;
@@ -17,9 +19,8 @@ import static gregtech.api.util.GTUtility.gregtechId;
 import static wfcore.common.materials.WFCoreMaterials.*;
 
 public class HbmMaterials {
-    public static void register() {
-        int id = 800;
-        AdvancedAlloy = new Material.Builder(id++, gregtechId("Advanced_Alloy"))
+    public static void register(AtomicInteger id) {
+        AdvancedAlloy = new Material.Builder(id.getAndAdd(1), gregtechId("Advanced_Alloy"))
                 .cableProperties(GTValues.V[GTValues.LV], 4, 0, true)
                 .color(0xE24207).ingot()
                 .liquid(new FluidBuilder().temperature(1373))
@@ -29,7 +30,7 @@ public class HbmMaterials {
                 .fluidPipeProperties(1200, 40, true)
                 .blast(b -> b.temp(1373, GasTier.LOW).blastStats(VA[MV], 200))
                 .build();
-        Desh = new Material.Builder(id++, gregtechId("Workers_Alloy"))
+        Desh = new Material.Builder(id.getAndAdd(1), gregtechId("Workers_Alloy"))
                 .cableProperties(GTValues.V[GTValues.MV], 4, 0, true)
                 .color(0xA80300).ingot()
                 .liquid(new FluidBuilder().temperature(1373))
@@ -39,7 +40,7 @@ public class HbmMaterials {
                 .fluidPipeProperties(1200, 40, true)
                 .blast(b -> b.temp(2700, GasTier.LOW).blastStats(VA[HV], 200))
                 .build();
-        Australium = new Material.Builder(id++, gregtechId("Australium"))
+        Australium = new Material.Builder(id.getAndAdd(1), gregtechId("Australium"))
                 .cableProperties(GTValues.V[GTValues.MV], 4, 0, true)
                 .color(0xFED73A).ingot()
                 .liquid(new FluidBuilder().temperature(1373))
@@ -49,7 +50,7 @@ public class HbmMaterials {
                 .fluidPipeProperties(1200, 40, true)
                 .blast(b -> b.temp(2700, GasTier.LOW).blastStats(VA[HV], 200))
                 .build();
-        Schrabidium = new Material.Builder(id++, gregtechId("Schrabidium"))
+        Schrabidium = new Material.Builder(id.getAndAdd(1), gregtechId("Schrabidium"))
                 .cableProperties(GTValues.V[GTValues.MV], 4, 0, true)
                 .color(0x2CD8DF).ingot()
                 .liquid(new FluidBuilder().temperature(1373))
@@ -62,7 +63,7 @@ public class HbmMaterials {
         Bromine.setProperty(PropertyKey.DUST, new DustProperty());
         Bromine.setProperty(PropertyKey.INGOT, new IngotProperty());
         Actinium.setProperty(PropertyKey.INGOT, new IngotProperty());
-        Unobtainium = new Material.Builder(id++, gregtechId("Unobtainium"))
+        Unobtainium = new Material.Builder(id.getAndAdd(1), gregtechId("Unobtainium"))
                 .cableProperties(GTValues.V[GTValues.MV], 4, 0, true)
                 .color(0x013C7F).ingot()
                 .liquid(new FluidBuilder().temperature(1373))
@@ -72,7 +73,7 @@ public class HbmMaterials {
                 .fluidPipeProperties(1200, 40, true)
                 .blast(b -> b.temp(2700, GasTier.LOW).blastStats(VA[HV], 200))
                 .build();
-        CMBSteel = new Material.Builder(id++, gregtechId("C_M_B_Steel"))
+        CMBSteel = new Material.Builder(id.getAndAdd(1), gregtechId("C_M_B_Steel"))
                 .cableProperties(GTValues.V[GTValues.MV], 4, 0, true)
                 .color(0x001431).ingot()
                 .liquid(new FluidBuilder().temperature(1373))
@@ -84,7 +85,7 @@ public class HbmMaterials {
                 .build();
         Astatine.setProperty(PropertyKey.DUST, new DustProperty());
         Astatine.setProperty(PropertyKey.INGOT, new IngotProperty());
-        Verticium = new Material.Builder(id++, gregtechId("Verticium"))
+        Verticium = new Material.Builder(id.getAndAdd(1), gregtechId("Verticium"))
                 .cableProperties(GTValues.V[GTValues.MV], 4, 0, true)
                 .color(0x29AE01).ingot()
                 .liquid(new FluidBuilder().temperature(1373))
