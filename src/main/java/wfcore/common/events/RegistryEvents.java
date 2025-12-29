@@ -21,6 +21,7 @@ import wfcore.common.blocks.BlockRegistry;
 import wfcore.common.items.ItemRegistry;
 import wfcore.common.materials.WFCoreMaterials;
 import wfcore.common.metatileentities.WFCoreMetaTileEntities;
+import wfcore.common.recipe.GregtechRecipes;
 import wfcore.common.recipe.VanillaRecipes;
 import wfcore.common.recipe.chain.LargeBlastFurnace;
 import wfcore.common.recipe.chain.SteamWiremillRecipes;
@@ -55,7 +56,7 @@ public class RegistryEvents {
         LargeBlastFurnace.init();
         VanillaRecipes.registerCTRecipes(event);
         VanillaRecipes.registerFurnaceRecipes(event);
-    }
+        GregtechRecipes.registerGregTechRecipes();    }
 
     @SubscribeEvent
     public void registerItems(RegistryEvent.Register<Item> event) {

@@ -6,14 +6,18 @@ import net.minecraft.item.Item;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.event.entity.EntityEvent;
+import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
+import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.*;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import wfcore.api.radar.MultiblockRadarLogic;
 import wfcore.common.proxy.CommonProxy;
 import wfcore.common.recipe.GregtechRecipes;
 import wfcore.common.recipe.HBMRecepies;
@@ -25,63 +29,62 @@ import wfcore.common.recipe.chain.SteamWiremillRecipes;
         dependencies = "after:hbm;after:mcheli;required:gregtech;required-after-client:mcgltf;required-client:ctm"
 )
 public class WFCore {
-
     public static final Logger LOGGER = LogManager.getLogger(Tags.MODID);
     public static final String MODID = "wfcore";
-    public static final boolean DEBUG = false;
+    public static final boolean DEBUG = true;
 
+    @SidedProxy(
+            clientSide = "wfcore.common.proxy.ClientProxy",
+            serverSide = "wfcore.common.proxy.CommonProxy"
+    )
     public static CommonProxy proxy;
 
-    @EventHandler
+    @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
-        MinecraftForge.EVENT_BUS.register(this);
+        proxy.preInit(event);
+
+        // read the radar config file
+        MultiblockRadarLogic.readRadarConfig();
     }
 
-
-    @SubscribeEvent
-    // Register recipes here (Remove if not needed)
-    public void registerRecipes(RegistryEvent.Register<IRecipe> event) {
-        SteamWiremillRecipes.init();
-        LargeBlastFurnace.init();
-        VanillaRecipes.registerCTRecipes(event);
-        VanillaRecipes.registerFurnaceRecipes(event);
-        GregtechRecipes.registerGregTechRecipes();
-
-    }
-
-
-    @SubscribeEvent
-    // Register items here (Remove if not needed)
-    public void registerItems(RegistryEvent.Register<Item> event) {
-
-    }
-
-    @SubscribeEvent
-    // Register blocks here (Remove if not needed)
-    public void registerBlocks(RegistryEvent.Register<Block> event) {
-
-    }
-
-    @EventHandler
-    // load "Do your mod setup. Build whatever data structures you care about." (Remove if not needed)
+    @Mod.EventHandler
     public void init(FMLInitializationEvent event) {
+        proxy.init(event);
     }
 
-    @EventHandler
-    public void init(FMLLoadCompleteEvent event) {
-        if(FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT)
-            HBMRecepies.init(event);
+    @Mod.EventHandler
+    public void loadComplete(FMLLoadCompleteEvent event) {
+        proxy.loadComplete(event);
     }
 
-    @EventHandler
-    // postInit "Handle interaction with other mods, complete your setup based on this." (Remove if not needed)
+    @Mod.EventHandler
     public void postInit(FMLPostInitializationEvent event) {
+        proxy.postInit(event);
     }
 
-    @EventHandler
-    // register server commands in this event handler (Remove if not needed)
+    @Mod.EventHandler
     public void serverStarting(FMLServerStartingEvent event) {
+        proxy.serverStarting(event);
     }
 
+    // we need may want to check blocks after they are placed to track them
+    @SubscribeEvent
+    public void blockPlaced(BlockEvent.EntityPlaceEvent event) {
+        // only handle on server
+        if (event.getWorld().isRemote) {
+            return;
+        }
+
+
+    }
+
+    // we may want to inspect all entities when they are created
+    @SubscribeEvent
+    public void entityConstructing(EntityEvent.EntityConstructing event) {
+        // only handle on server
+        if (event.getEntity().getEntityWorld().isRemote) {
+            return;
+        }
+    }
 
 }
