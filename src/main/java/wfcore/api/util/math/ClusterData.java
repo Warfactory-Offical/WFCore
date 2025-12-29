@@ -41,17 +41,16 @@ public class ClusterData {
         str.append(centerPoint.toString());
         str.append(" with ");
         str.append(playerPopulation);
-        str.append(" many players inside ");
+        str.append(" player(s) inside ");
         str.append(boundingBox.toString());
 
         // list points
-        str.append("\nRelevant Coordinates: [\n");
+        str.append("\nCOORDS: [\n    ");
         var coordIt = coordinates.iterator();
         int coordsOnLine = 0;
         while (coordIt.hasNext()) {
             IntCoord2 currCoord = coordIt.next();
             // list points
-            str.append("\t");
             str.append(currCoord.toString());
             ++coordsOnLine;
 
@@ -59,7 +58,7 @@ public class ClusterData {
             if (coordIt.hasNext()) {
                 // only put five coordinates on a given line
                 if (coordsOnLine >= 5) {
-                    str.append(",\n");
+                    str.append(",\n    ");
                     coordsOnLine = 0;
                 } else {
                     str.append(", ");
@@ -67,6 +66,7 @@ public class ClusterData {
             }
         }
 
+        str.append("\n]");
         return str.toString();
     }
 

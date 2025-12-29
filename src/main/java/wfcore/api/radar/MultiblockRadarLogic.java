@@ -14,6 +14,7 @@ import wfcore.WFCore;
 import wfcore.api.util.math.ClusterData;
 import wfcore.api.util.math.IntCoord2;
 import wfcore.api.util.math.BoundingBox;
+import wfcore.common.managers.RadarManager;
 import wfcore.common.metatileentities.multi.electric.MetaTileEntityRadar;
 
 import java.io.FileInputStream;
@@ -30,7 +31,7 @@ import static wfcore.api.util.LogUtil.logExceptionWithTrace;
 
 public class MultiblockRadarLogic {
     //TODO: Make those values adjustable in GUI
-    public int MIN_PTS = 4;
+    public int MIN_PTS = 1;
     public int EPS = 10;
 
     private int voltageTier;
@@ -188,7 +189,8 @@ public class MultiblockRadarLogic {
     }
 
     public static boolean isOnTEWhitelist(TileEntity tileEntity) {
-        return TE_WHITELIST.contains(RadarTargetIdentifier.getBestIdentifier(tileEntity));
+        RadarTargetIdentifier currId = RadarTargetIdentifier.getBestIdentifier(tileEntity);
+        return TE_WHITELIST.contains(currId);
     }
 
     static public IntCoord2 getCoordPair(BlockPos pos) {

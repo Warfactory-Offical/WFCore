@@ -216,19 +216,19 @@ public class MetaTileEntityRadar extends MultiblockWithDisplayBase implements IA
     @Override
     protected ModularUI.Builder createUITemplate(EntityPlayer entityPlayer) {
         ModularUI.Builder builder = ModularUI
-                .builder(GuiTextures.BORDERED_BACKGROUND, 176, 208);
+                .builder(GuiTextures.BORDERED_BACKGROUND, 256/*176*/, 208);
         builder.shouldColor(false);
-        builder.image(4, 4, 168, 117, GuiTextures.DISPLAY);
+        builder.image(4, 4, 248, 117, GuiTextures.DISPLAY);
         builder.label(9, 9, getMetaFullName(), 0xFFFFFF);
-        builder.widget(new ClickButtonWidget(9, 90, 60, 20, "SCAN", this::onScanClick));
+        builder.widget(new ClickButtonWidget(9, 96, 60, 20, "SCAN", this::onScanClick));
         builder.widget(new AdvancedTextWidget(9, 20, this::addDisplayText, 0xFFFFFF)
                 .setMaxWidthLimit(162)
                 .setClickHandler(this::handleDisplayClick));
-        builder.widget(new IndicatorImageWidget(152, 101, 17, 17, getLogo())
+        builder.widget(new IndicatorImageWidget(232, 101, 17, 17, getLogo())
                 .setWarningStatus(getWarningLogo(), this::addWarningText)
                 .setErrorStatus(getErrorLogo(), this::addErrorText));
         builder.bindPlayerInventory(entityPlayer.inventory,
-                GuiTextures.SLOT, 7, 125);
+                GuiTextures.SLOT, 47, 125);
         return builder;
     }
 
