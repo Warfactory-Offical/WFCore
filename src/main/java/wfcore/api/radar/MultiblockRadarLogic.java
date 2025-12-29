@@ -16,7 +16,6 @@ import net.minecraftforge.fml.common.FMLCommonHandler;
 import org.apache.commons.math3.ml.clustering.Cluster;
 import org.apache.commons.math3.ml.clustering.DBSCANClusterer;
 import org.jetbrains.annotations.NotNull;
-import org.yaml.snakeyaml.Yaml;
 import wfcore.WFCore;
 import wfcore.api.util.math.ClusterData;
 import wfcore.api.util.math.IntCoord2;
@@ -70,7 +69,7 @@ public class MultiblockRadarLogic {
     ));
 
     // this may be useful eventually, but currently handling each mod's method of registering tile entities is too involved
-    public static void readRadarConfig() {
+    public static void readRadarConfig() {/*
         Map<String, Object> globalRadarData;
         WFCore.LOGGER.atDebug().log("Beginning reading of radar config.");
 
@@ -94,7 +93,7 @@ public class MultiblockRadarLogic {
         populateWhitelist(TE_WHITELIST, blocks);
         populateWhitelist(ENTITY_WHITELIST, entities);
 
-        WFCore.LOGGER.atDebug().log("Finished reading radar config");
+        WFCore.LOGGER.atDebug().log("Finished reading radar config");*/
     }
 
     private static void populateWhitelist(
