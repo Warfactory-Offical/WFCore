@@ -1,6 +1,5 @@
 package wfcore.api.items;
 
-import com.github.bsideup.jabel.Desugar;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -11,7 +10,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-@Desugar
 public record AbstractStack(Item item, int meta, byte count)
         implements Comparable<AbstractStack> {
 
