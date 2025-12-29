@@ -129,7 +129,7 @@ public class BlockBoltableCasing extends VariantBlock<BlockBoltableCasing.Boltab
             }
         }
 
-        ILookOverlay.printGeneric(event, I18nUtil.resolveKey(state.getBlock().getTranslationKey()), 0xffff00, 0x404000, text);
+        ILookOverlay.printGeneric(event, I18nUtil.resolveKey(state.getBlock().getTranslationKey()+".name"), 0xffff00, 0x404000, text);
 
     }
 

@@ -15,6 +15,7 @@ public class BlockRegistry {
 
     public static final Set<Block> BLOCKS = new HashSet<>();
     public static BlockBoltableCasing BOLTABLE_CASING = new BlockBoltableCasing("casing_boltable");
+    public static BlockMetalSheetCasing SHEET_CASING = new BlockMetalSheetCasing("sheet_casing");
 
 
 
