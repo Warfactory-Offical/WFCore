@@ -40,7 +40,7 @@
 dependencies {
 
     annotationProcessor "org.projectlombok:lombok:1.18.42", "io.gitlab.hohserg.elegant.networking:annotation-processor:3.14"
-    compileOnly("org.projectlombok:lombok:1.18.42")
+    compileOnly "org.projectlombok:lombok:1.18.42"
     implementation "io.gitlab.hohserg.elegant.networking:elegant-networking-1.12:3.14"
 
 
@@ -57,8 +57,12 @@ dependencies {
     implementation rfg.deobf("curse.maven:hbm-nuclear-tech-mod-community-edition-1312314:7374941")
     implementation rfg.deobf("curse.maven:mchce-1383222:7393873")
 
-    implementation rfg.deobf("curse.maven:ctm-267602:2915363")
-    runtimeOnly rfg.deobf("curse.maven:building-gadgets-298187:3005950")
+    runtimeOnly rfg.deobf("curse.maven:ctm-267602:2915363")
+
+    //Multiblock assistant mods
+    runtimeOnly rfg.deobf("curse.maven:lunatriuscore-225605:2489549")
+    runtimeOnly rfg.deobf("curse.maven:schematica-225603:2554100")
+
 
 //    implementation rfg.deobf("curse.maven:groovyscript-687577:4991701") // GRS 0.7.3
 
