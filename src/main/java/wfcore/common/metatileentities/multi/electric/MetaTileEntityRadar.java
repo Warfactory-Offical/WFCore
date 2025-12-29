@@ -34,6 +34,7 @@ import gregtech.common.blocks.BlockMachineCasing;
 import gregtech.common.blocks.MetaBlocks;
 import lombok.Getter;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -197,7 +198,7 @@ public class MetaTileEntityRadar extends MultiblockWithDisplayBase implements IA
     protected void addDisplayText(List<ITextComponent> textList) {
         MultiblockDisplayText.builder(textList, this.isStructureFormed()).addCustom(tl -> {
             // get the cluster data to use and set a default
-            List<ClusterData> data = logic.accessScanResults(null);
+            List<ClusterData> data = logic.lastScan;
             String dataString = "NO DATA";
 
             // if data is present, begin converting it, incrementing index every 5 seconds
@@ -263,12 +264,27 @@ public class MetaTileEntityRadar extends MultiblockWithDisplayBase implements IA
     public boolean shouldRender() {
         return true;
     }
+
     @Override
     public boolean allowsExtendedFacing() {
         return false;
     }
+
     @Override
     public Collection<BlockPos> getHiddenBlocks() {
         return new ArrayList<>();
+    }
+
+    @Override
+    public NBTTagCompound writeToNBT(NBTTagCompound data) {
+        super.writeToNBT(data);
+        logic.writeToNBT(data);
+        return data;
+    }
+
+    @Override
+    public void readFromNBT(NBTTagCompound data) {
+        super.readFromNBT(data);
+        logic.readFromNBT(data);
     }
 }

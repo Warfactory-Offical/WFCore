@@ -1,20 +1,26 @@
 package wfcore.api.radar;
 
+import com.mojang.realmsclient.util.Pair;
+import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import org.apache.commons.math3.ml.clustering.Cluster;
 import org.apache.commons.math3.ml.clustering.DBSCANClusterer;
+import org.jetbrains.annotations.NotNull;
 import org.yaml.snakeyaml.Yaml;
 import wfcore.WFCore;
 import wfcore.api.util.math.ClusterData;
 import wfcore.api.util.math.IntCoord2;
 import wfcore.api.util.math.BoundingBox;
-import wfcore.common.managers.RadarManager;
 import wfcore.common.metatileentities.multi.electric.MetaTileEntityRadar;
 
 import java.io.FileInputStream;
@@ -37,7 +43,8 @@ public class MultiblockRadarLogic {
     private int voltageTier;
     private int overclockAmount;
     private Map<IntCoord2, Object> LoadedValidObjects  = new HashMap<>();
-    private List<ClusterData> scanResults = new ArrayList<>();
+    private static Object2ObjectOpenHashMap<UUID, List<ClusterData>> SCAN_RESULTS = new Object2ObjectOpenHashMap<>();
+    public List<ClusterData> lastScan = new ArrayList<>();
     private MetaTileEntityRadar metaTileEntity;
     private boolean isActive;
     private boolean canWork;
@@ -143,14 +150,53 @@ public class MultiblockRadarLogic {
         isActive = false;
     }
 
-    // synchronized access for reading or write to the scan results, passing null to return a copy arraylist
-    public synchronized List<ClusterData> accessScanResults(List<ClusterData> input) {
-        if (input == null) {
-            return new ArrayList<ClusterData>(scanResults);
+    // read the result and return a copy of the list
+    public Pair<UUID, List<ClusterData>> readScanResult(UUID key, boolean doDeletion) {
+        return accessScanResults(new ArrayList<>(), key);
+    }
+
+    // returns the key assigned to the given input
+    public UUID addScanResult(List<ClusterData> input) {
+        return accessScanResults(input, null).first();
+    }
+
+    // synchronized access for reading or write to the scan results, with the returned object being a
+    @NotNull
+    private synchronized Pair<UUID, @NotNull List<ClusterData>> accessScanResults(List<ClusterData> input, UUID key) {
+        // if a key exists, we must be doing a read
+        if (key != null) {
+            // if the input is null we are just reading
+            if (input == null) {
+                return Pair.of(key, new ArrayList<>(SCAN_RESULTS.get(key)));
+            }
+
+            // if the input is an empty list we are doing a read w/ delete
+            if (input.size() == 0) {
+                Pair<UUID, List<ClusterData>> result = Pair.of(key, new ArrayList<>(SCAN_RESULTS.get(key)));
+                SCAN_RESULTS.remove(key);
+                return result;
+            }
+
+            // an input must have been passed with a key, which is not defined and so will be ignored
+            return Pair.of(key, new ArrayList<>());
         }
 
-        scanResults = input;
-        return null;
+        // generate an initial key assuming no other inserts have occurred at this time in milliseconds
+        final long INSERT_TIME = System.currentTimeMillis();
+        long keyIdx = 0;
+        key = new UUID(keyIdx, INSERT_TIME);
+
+        // its unlikely enough scans finish w/in the same ms that this linear search becomes an issue; fix this if it does
+        while (SCAN_RESULTS.containsKey(key)) {
+            key = new UUID(++keyIdx, INSERT_TIME);
+        }
+
+        // insert the data with the given key
+        SCAN_RESULTS.put(key, input);
+        lastScan = new ArrayList<>(input);  // make a copy to use within this specific logic instance
+
+        // return the key created for the data passed as the only entry in the set
+        return Pair.of(key, input);
     }
 
     private boolean canScan() {
@@ -179,7 +225,7 @@ public class MultiblockRadarLogic {
             this.LoadedValidObjects  = this.collectValidEntites();
             //Run dbscan
             //this.scanResults = clusterData;
-            calculateDBSCAN(LoadedValidObjects).thenAccept(this::accessScanResults).exceptionally(ex -> {
+            calculateDBSCAN(LoadedValidObjects).thenAccept(this::addScanResult).exceptionally(ex -> {
                 System.err.println("Error during DBSCAN calculation: " + ex.getMessage());
                 return null;
             });
@@ -308,7 +354,22 @@ public class MultiblockRadarLogic {
     }
 
     public NBTTagCompound writeToNBT(NBTTagCompound data) {
-        //FIXME
-        return null;
+        if (lastScan.size() == 0) { return data; }
+
+        NBTTagList lastScan = new NBTTagList();
+        this.lastScan.forEach(scanResult -> lastScan.appendTag(scanResult.toNBT()));
+        data.setTag("last_scan", lastScan);
+        return data;
+    }
+
+    public void readFromNBT(NBTTagCompound data) {
+        // don't overwrite existing data
+        if (lastScan != null && lastScan.size() > 0) { return; }
+        if (!data.hasKey("last_scan")) { return; }
+
+        // read the last scan
+        NBTTagList lastScan = data.getTagList("last_scan", 10);
+        this.lastScan = new ArrayList<>();
+        lastScan.tagList.forEach(tag -> this.lastScan.add(ClusterData.fromNBT((NBTTagCompound) tag)));
     }
 }

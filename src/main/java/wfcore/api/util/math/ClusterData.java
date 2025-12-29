@@ -1,5 +1,9 @@
 package wfcore.api.util.math;
 
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class ClusterData {
@@ -68,6 +72,31 @@ public class ClusterData {
 
         str.append("\n]");
         return str.toString();
+    }
+
+    public NBTTagCompound toNBT() {
+        NBTTagCompound nbt = new NBTTagCompound();
+        nbt.setInteger("pop", playerPopulation);
+        nbt.setTag("center", centerPoint.toNBT());
+        nbt.setTag("bounds", boundingBox.toNBT());
+
+        NBTTagList coords = new NBTTagList();
+        coordinates.forEach(coord -> coords.appendTag(coord.toNBT()));
+        nbt.setTag("coords", coords);
+
+        return nbt;
+    }
+
+    public static ClusterData fromNBT(NBTTagCompound nbt) {
+        List<IntCoord2> coords = new ArrayList<>();
+        nbt.getTagList("coords", 10).tagList.forEach(coordTag -> coords.add(IntCoord2.fromNBT((NBTTagCompound) coordTag)));
+
+        return new ClusterData(
+                coords,
+                IntCoord2.fromNBT(nbt.getCompoundTag("center")),
+                BoundingBox.fromNBT(nbt.getCompoundTag("bounds")),
+                nbt.getInteger("pop")
+        );
     }
 
 }
