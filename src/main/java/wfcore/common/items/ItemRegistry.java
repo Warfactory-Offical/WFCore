@@ -20,7 +20,7 @@ public class ItemRegistry {
     public static final Set<Item> ITEMS =  new HashSet<>();
 
     //Texture should be in assets/wfcore/textures/items
-    public static final Item example = new BaseItem("screwdriver", "screwdriver_default");
+    public static final Item EIGHT_CARROT = new ItemEightCarrot("eight_carrot");
 
     public static final RadarProbe RADAR_PROBE = new RadarProbe("radar_probe", "radar_probe");
     public static final PenDrive PEN_DRIVE = new PenDrive("pen_drive", "pen_drive");

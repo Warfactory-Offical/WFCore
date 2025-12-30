@@ -13,9 +13,11 @@ import gregtech.common.metatileentities.MetaTileEntities;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.crafting.CraftingHelper;
@@ -26,6 +28,7 @@ import net.minecraftforge.registries.ForgeRegistry;
 import org.jetbrains.annotations.NotNull;
 import wfcore.RefStrings;
 import wfcore.api.util.FurnaceUtil;
+import wfcore.common.items.ItemRegistry;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -39,6 +42,7 @@ public class VanillaRecipes {
 
     public static void registerFurnaceRecipes(RegistryEvent.Register<IRecipe> event){
         FurnaceUtil.removeByOutput(MetaItems.FIRECLAY_BRICK.getStackForm(1));
+        FurnaceRecipes.instance().addSmelting(Items.CARROT, new ItemStack(ItemRegistry.EIGHT_CARROT), 1);
     }
 
     public static void registerCTRecipes(RegistryEvent.Register<IRecipe> event) {

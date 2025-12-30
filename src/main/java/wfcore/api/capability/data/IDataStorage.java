@@ -125,6 +125,7 @@ public interface IDataStorage {
 
     public static BigInteger bitsUsed(ArrayList<IData> data) {
         BigInteger bitsUsed = BigInteger.ZERO;
+        if(data == null) return bitsUsed;
         for (var currData : data) {
             bitsUsed = bitsUsed.add(currData.numBits());
         }
