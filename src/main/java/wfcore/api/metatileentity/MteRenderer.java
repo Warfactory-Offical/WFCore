@@ -128,7 +128,7 @@ public abstract class MteRenderer<T extends MetaTileEntity & IAnimatedMTE> imple
             var name = animationModel.getName().toLowerCase(Locale.ROOT).split("_");
             if (name.length > 1 && name[1].equals("loop"))
                 rawAnim.setLoop(true);
-            animations.put(animationModel.getName(), rawAnim);
+            animations.put(name[0], rawAnim);
         }
         this.animations = animations.build();
     }
