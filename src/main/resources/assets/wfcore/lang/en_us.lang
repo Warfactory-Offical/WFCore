@@ -46,6 +46,13 @@ item.radar_probe.name=Radar Debug Probe
 # info
 info.radar_probe.default=Used to show the names the radar will need to be supplied to target specific (tile) entities.
 info.radar_probe.advanced=The CASIO fx-9750GII is a cool programmable calculator
+info.data_storage.free=Free
+info.data_storage.taken=Taken
+info.pen_drive.default=Stores %s in an easy to transport form factor.
+
+
+# util/format
+wfcore.data.bit_or_bits=bit(s)
 
 # gommers shenanigans
 item.hbm.ingot_asbestos.name=Asbestos Ingot

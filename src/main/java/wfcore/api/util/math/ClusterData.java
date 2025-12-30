@@ -2,37 +2,26 @@ package wfcore.api.util.math;
 
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import wfcore.api.capability.data.IData;
+import wfcore.api.capability.data.DataHandler;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ClusterData {
-    private final List<IntCoord2> coordinates;
-    private final IntCoord2 centerPoint;
-    private final BoundingBox boundingBox;
-    private final int playerPopulation;
+public class ClusterData implements IData {
+    public final List<IntCoord2> coordinates;
+    public final IntCoord2 centerPoint;
+    public final BoundingBox boundingBox;
+    public final int playerPopulation;
+    public final BigInteger bitsUsed;
 
     public ClusterData(List<IntCoord2> coordinates, IntCoord2 centerPoint, BoundingBox boundingBox, int playerPopulation) {
         this.coordinates = coordinates;
         this.centerPoint = centerPoint;
         this.boundingBox = boundingBox;
         this.playerPopulation = playerPopulation;
-    }
-
-    public List<IntCoord2> getCoordinates() {
-        return coordinates;
-    }
-
-    public IntCoord2 getCenterPoint() {
-        return centerPoint;
-    }
-
-    public BoundingBox getBoundingBox() {
-        return boundingBox;
-    }
-
-    public int getPlayerPopulation() {
-        return playerPopulation;
+        bitsUsed = BigInteger.valueOf(28 + ((long) coordinates.size() << 2));
     }
 
     // TODO: make this translatable
@@ -74,6 +63,18 @@ public class ClusterData {
         return str.toString();
     }
 
+    public static ClusterData fromNBT(NBTTagCompound nbt) {
+        List<IntCoord2> coords = new ArrayList<>();
+        nbt.getTagList("coords", 10).tagList.forEach(coordTag -> coords.add(IntCoord2.fromNBT((NBTTagCompound) coordTag)));
+
+        return new ClusterData(
+                coords,
+                IntCoord2.fromNBT(nbt.getCompoundTag("center")),
+                BoundingBox.fromNBT(nbt.getCompoundTag("bounds")),
+                nbt.getInteger("pop")
+        );
+    }
+
     public NBTTagCompound toNBT() {
         NBTTagCompound nbt = new NBTTagCompound();
         nbt.setInteger("pop", playerPopulation);
@@ -87,16 +88,13 @@ public class ClusterData {
         return nbt;
     }
 
-    public static ClusterData fromNBT(NBTTagCompound nbt) {
-        List<IntCoord2> coords = new ArrayList<>();
-        nbt.getTagList("coords", 10).tagList.forEach(coordTag -> coords.add(IntCoord2.fromNBT((NBTTagCompound) coordTag)));
-
-        return new ClusterData(
-                coords,
-                IntCoord2.fromNBT(nbt.getCompoundTag("center")),
-                BoundingBox.fromNBT(nbt.getCompoundTag("bounds")),
-                nbt.getInteger("pop")
-        );
+    @Override
+    public DataHandler.DataClassIdentifier getId() {
+        return DataHandler.DataClassIdentifier.CLUSTER_DATA;
     }
 
+    @Override
+    public BigInteger numBits() {
+        return bitsUsed;
+    }
 }

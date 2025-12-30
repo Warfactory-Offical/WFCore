@@ -23,6 +23,7 @@ public class ItemRegistry {
     public static final Item example = new BaseItem("screwdriver", "screwdriver_default");
 
     public static final RadarProbe RADAR_PROBE = new RadarProbe("radar_probe", "radar_probe");
+    public static final PenDrive PEN_DRIVE = new PenDrive("pen_drive", "pen_drive");
 
 
     public static Optional<ItemBlock> createItemBlock(Block block, Function<Block, ItemBlock> producer) {
