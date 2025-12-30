@@ -1,13 +1,12 @@
 package wfcore.common.items;
 
-import ca.weblite.objc.Client;
-import net.minecraft.client.Minecraft;
+import gregtech.api.util.LocalizationUtils;
+import gregtech.api.util.TextComponentUtil;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.Style;
-import net.minecraft.util.text.TextComponentTranslation;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.text.*;
+import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -23,11 +22,19 @@ import java.util.List;
 
 public class PenDrive extends BaseItem implements IDataStorage {
     private final static BigInteger BIT_CAPACITY = BigInteger.valueOf(16 * G);
-    private final static int NUM_PERCENT_FIGURES = 4;
-    private final static BigInteger PERCENT_SCALAR = BigInteger.valueOf((long) Math.pow(10, (double) NUM_PERCENT_FIGURES));
+
+    private final static int NUM_PERCENT_DEC_FIGURES = 2;
+    private final static BigInteger PERCENT_SCALAR = BigInteger.valueOf((long) Math.pow(10, NUM_PERCENT_DEC_FIGURES));
+    private final static BigInteger PERCENT_HUNDRED = PERCENT_SCALAR.divide(BigInteger.valueOf(100L));
 
     public PenDrive(String s, String texturePath) {
         super(s, texturePath);
+    }
+
+    public static String padZeroes(String string, int targetLength) {
+        StringBuilder builder = new StringBuilder(string);
+        while (builder.length() < targetLength) { builder.append('0'); }
+        return builder.toString();
     }
 
     @SideOnly(Side.CLIENT)
@@ -38,19 +45,43 @@ public class PenDrive extends BaseItem implements IDataStorage {
         BigInteger bitsTaken = this.numBitsTaken(stack);
         BigInteger bitsFree = bitCapacity().subtract(bitsTaken);
         ITextComponent totalStorage = IDataStorage.formatBitCount(bitCapacity(), !isPressingShift, 3);
-        ITextComponent storageAvailable = IDataStorage.formatBitCount(bitsFree, !isPressingShift, 3);
         ITextComponent storageTaken = IDataStorage.formatBitCount(bitsTaken, !isPressingShift, 3);
+        ITextComponent storageAvailable = IDataStorage.formatBitCount(bitsFree, !isPressingShift, 3);
 
         // calculate percentages to certain number of places
-        BigInteger percentFree = bitsFree.multiply(PERCENT_SCALAR).divide(bitCapacity());
-        BigInteger percentTaken = bitsFree.multiply(PERCENT_SCALAR).divide(bitCapacity());
+        BigInteger[] percentTaken = bitsTaken.multiply(PERCENT_SCALAR).divide(bitCapacity()).divideAndRemainder(PERCENT_HUNDRED);
+        BigInteger[] percentFree = bitsFree.multiply(PERCENT_SCALAR).divide(bitCapacity()).divideAndRemainder(PERCENT_HUNDRED);
 
-        tooltip.add(
-                new TextComponentTranslation(
-                        "info.pen_drive.default"
-                        )
-                        .setStyle(new Style().setColor(TextFormatting.GRAY)).getFormattedText());
+        // we get the unformatted text because we dont want the conversion to insert text formatting reset characters; we just want text
+        TextComponentTranslation defaultText = new TextComponentTranslation("info.pen_drive.default", totalStorage);
+        TextComponentString spaceTaken = TextComponentUtil.stringWithColor(TextFormatting.RED, (" %s (%s.%s%%) %s").formatted(
+                storageTaken.getUnformattedText(),
+                percentTaken[0].toString(10),
+                padZeroes(percentTaken[1].toString(10), NUM_PERCENT_DEC_FIGURES),
+                LocalizationUtils.format("info.data_storage.taken")
+        ));
 
+        TextComponentString spaceFree = TextComponentUtil.stringWithColor(TextFormatting.DARK_GREEN, (" %s (%s.%s%%) %s").formatted(
+                storageAvailable.getUnformattedText(),
+                percentFree[0].toString(10),
+                padZeroes(percentFree[1].toString(10), NUM_PERCENT_DEC_FIGURES),
+                LocalizationUtils.format("info.data_storage.free")
+        ));
+
+        StringBuilder result = new StringBuilder(defaultText.getFormattedText());
+        if (bitsTaken.compareTo(BigInteger.ZERO) > 0) {
+            result.append(spaceTaken.getFormattedText());
+        }
+
+        if (bitsFree.compareTo(BigInteger.ZERO) > 0) {
+            if (!defaultText.getSiblings().isEmpty()) {
+                result.append(", ");
+            }
+
+            result.append(spaceFree.getFormattedText());
+        }
+
+        tooltip.add(result.toString());
     }
 
     @Override
@@ -79,12 +110,12 @@ public class PenDrive extends BaseItem implements IDataStorage {
     }
 
     @Override
-    public long numCyclesToWriteWord() {
+    public long numBitsWrittenPerCycle() {
         return 1;
     }
 
     @Override
-    public long numCyclesToReadWord() {
+    public long numBitsReadPerCycle() {
         return 1;
     }
 
@@ -104,21 +135,21 @@ public class PenDrive extends BaseItem implements IDataStorage {
         var bitsAvailable = numBitsFree(stack);
 
         // not enough space to store
-        if (bitsNeeded.compareTo(bitsAvailable) < 0) {
+        if (bitsNeeded.compareTo(bitsAvailable) > 0) {
             return false;
         }
 
         // read the nbt, update it, and write back
-        var stackNBT = stack.serializeNBT();
+        var stackNBT = stack.getTagCompound() == null ? new NBTTagCompound() : stack.getTagCompound();
         data.forEach(dataInst -> IDataStorage.writeDataToNBT(dataInst, stackNBT));
-        stack.deserializeNBT(stackNBT);
+        stack.setTagCompound(stackNBT);
 
         return true;
     }
 
     @Override
     public ArrayList<IData> readData(ItemStack stack) {
-        return IDataStorage.readDataFromNBT(stack.serializeNBT());
+        return IDataStorage.readDataFromNBT(stack.getTagCompound());
     }
 
 }

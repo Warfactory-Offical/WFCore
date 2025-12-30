@@ -31,6 +31,7 @@ import gregtech.api.util.TextComponentUtil;
 import gregtech.client.renderer.ICubeRenderer;
 import gregtech.client.renderer.texture.Textures;
 import gregtech.common.blocks.BlockMachineCasing;
+import gregtech.common.blocks.BlockMetalCasing;
 import gregtech.common.blocks.MetaBlocks;
 import lombok.Getter;
 import net.minecraft.entity.player.EntityPlayer;
@@ -41,11 +42,14 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import org.jetbrains.annotations.NotNull;
+import wfcore.api.capability.data.IData;
+import wfcore.api.capability.data.IDataStorage;
 import wfcore.api.metatileentity.IAnimatedMTE;
 import wfcore.api.radar.MultiblockRadarLogic;
 import wfcore.api.util.math.ClusterData;
@@ -67,6 +71,7 @@ public class MetaTileEntityRadar extends MultiblockWithDisplayBase implements IA
 
 
     private long tickCounter = 0;
+    private boolean tryWrite = false;
 
     public MetaTileEntityRadar(ResourceLocation metaTileEntityId) {
         super(metaTileEntityId);
@@ -93,13 +98,17 @@ public class MetaTileEntityRadar extends MultiblockWithDisplayBase implements IA
     protected @NotNull BlockPattern createStructurePattern() {
         // direction subsequent chars, strings, and aisles travel in relative to controller faces, respectively
         return FactoryBlockPattern.start(RelativeDirection.FRONT, RelativeDirection.UP, RelativeDirection.RIGHT)
-                .aisle("ZPP")
+                .aisle("ZIE")
                 .where('Z', selfPredicate())
-                .where('P', states(MetaBlocks.MACHINE_CASING.getState(BlockMachineCasing.MachineCasingType.ULV))
-                        .or(abilities(MultiblockAbility.INPUT_ENERGY)
-                                .setMinGlobalLimited(1))
-                        .or(this.maintenancePredicate())
-                        .setExactLimit(1))
+                .where('I', abilities(MultiblockAbility.IMPORT_ITEMS).setExactLimit(1))
+                .where('E', abilities(MultiblockAbility.INPUT_ENERGY).setExactLimit(1))
+                //.where('P', states(MetaBlocks.MACHINE_CASING.getState(BlockMachineCasing.MachineCasingType.ULV))
+                //        .or(abilities(MultiblockAbility.INPUT_ENERGY)
+                //                .setMinGlobalLimited(1))
+                //        .or(abilities(MultiblockAbility.MAINTENANCE_HATCH)).setExactLimit(1))
+                //.where('I', states(MetaBlocks.MACHINE_CASING.getState(BlockMachineCasing.MachineCasingType.ULV)))
+                        //.or(abilities(MultiblockAbility.IMPORT_ITEMS)
+                                //.setMinGlobalLimited(1)))
                 .build();
     }
 
@@ -116,6 +125,8 @@ public class MetaTileEntityRadar extends MultiblockWithDisplayBase implements IA
     // do radar stuff every tick on the server
     @Override
     public void update() {
+        super.update();  // YOU MUST DO THIS FOR THE STRUCTURE TO FORM AND OTHER IMPORTANT STUFF TO OCCUR
+
         // ignore clients
         if (this.getWorld().isRemote) {
             return;
@@ -130,8 +141,24 @@ public class MetaTileEntityRadar extends MultiblockWithDisplayBase implements IA
             return;
         }
 
-        if (!isStructureFormed()) {
-            checkStructurePattern();
+        // no items to process or not allowed to process
+        if (inputInventory == null || inputInventory.getSlots() == 0 || !tryWrite) {
+            return;
+        }
+
+        // check all slots
+        for (int slotId = 0; slotId < inputInventory.getSlots(); ++slotId) {
+            // check if there is a data storage device/ stack
+            var slotStack = inputInventory.getStackInSlot(slotId);  // DO NOT MODIFY STACK
+            if (!(slotStack.getItem() instanceof IDataStorage storage)) { return; }
+
+            // check if we have data to store
+            if (logic.lastScan != null) {
+                // write the last scan to the data storage item
+                var stackToWrite = slotStack.copy();  // create copy that we are allowed to modify
+                tryWrite = !storage.writeData(stackToWrite, new ArrayList<>(logic.lastScan));  // update tryWrite on successful writes only
+                inputInventory.setStackInSlot(slotId, stackToWrite);
+            }
         }
     }
 
@@ -195,14 +222,18 @@ public class MetaTileEntityRadar extends MultiblockWithDisplayBase implements IA
         logic.performScan();
     }
 
+    private void onWriteToggleClick(Widget.ClickData data) {
+        tryWrite = !tryWrite;
+    }
+
     protected void addDisplayText(List<ITextComponent> textList) {
         MultiblockDisplayText.builder(textList, this.isStructureFormed()).addCustom(tl -> {
             // get the cluster data to use and set a default
             List<ClusterData> data = logic.lastScan;
-            String dataString = "NO DATA";
+            String dataString = new TextComponentTranslation("info.data.no_data").getFormattedText();
 
             // if data is present, begin converting it, incrementing index every 5 seconds
-            if (data.size() > 0) {
+            if (!data.isEmpty()) {
                 int clusterIdx = ((int) tickCounter / 100) % data.size();
                 ClusterData targetData = data.get(clusterIdx);
                 dataString = targetData.toString();
@@ -214,6 +245,14 @@ public class MetaTileEntityRadar extends MultiblockWithDisplayBase implements IA
         });
     }
 
+    private void addWriteInfoText(List<ITextComponent> textList) {
+        if (tryWrite) {
+            textList.add(TextComponentUtil.translationWithColor(TextFormatting.GREEN, "info.data.try_write"));
+        } else {
+            textList.add(TextComponentUtil.translationWithColor(TextFormatting.RED, "info.data.not_try_write"));
+        }
+    }
+
     @Override
     protected ModularUI.Builder createUITemplate(EntityPlayer entityPlayer) {
         ModularUI.Builder builder = ModularUI
@@ -222,6 +261,8 @@ public class MetaTileEntityRadar extends MultiblockWithDisplayBase implements IA
         builder.image(4, 4, 248, 117, GuiTextures.DISPLAY);
         builder.label(9, 9, getMetaFullName(), 0xFFFFFF);
         builder.widget(new ClickButtonWidget(9, 96, 60, 20, "SCAN", this::onScanClick));
+        builder.widget(new ClickButtonWidget(71, 96, 80, 20, "WRITE TOGGLE", this::onWriteToggleClick));
+        builder.widget(new AdvancedTextWidget(155, 106, this::addWriteInfoText, 0xFFFFFF));
         builder.widget(new AdvancedTextWidget(9, 20, this::addDisplayText, 0xFFFFFF)
                 .setMaxWidthLimit(162)
                 .setClickHandler(this::handleDisplayClick));

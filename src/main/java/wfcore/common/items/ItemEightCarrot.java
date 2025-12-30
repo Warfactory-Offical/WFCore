@@ -25,7 +25,7 @@ import wfcore.api.SelfRegisteringModel;
 import javax.annotation.Nullable;
 import java.util.List;
 
-public class ItemEightCarrot extends  ItemFood implements SelfRegisteringModel {
+public class ItemEightCarrot extends ItemFood implements SelfRegisteringModel {
     public static final String ROOT_PATH = "items/";
     String texturePath;
 

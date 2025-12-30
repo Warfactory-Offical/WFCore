@@ -8,6 +8,7 @@ import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.jetbrains.annotations.NotNull;
 import wfcore.WFCore;
 
 import java.math.BigInteger;
@@ -33,7 +34,7 @@ public interface IDataStorage {
     };
 
     public static String[] prefixNames = {
-            "", "K", "M", "G", "T", "P", "E", "Z", "Y"
+            "", "k", "M", "G", "T", "P", "E", "Z", "Y"
     };
 
     // each data inheritor must specify the method it uses to create an instance of itself from NBT
@@ -70,8 +71,7 @@ public interface IDataStorage {
 
         // return the formatted bit count
         return new TextComponentString((wasExact ? "" : "~") + result[0].toString(10) + "." + remainderString
-                + " " + prefixNames[prefixFlooredPowOfTen])
-                .appendSibling(new TextComponentTranslation("b"));
+                + prefixNames[prefixFlooredPowOfTen] + "b");
     }
 
     private static boolean hasClassId(int classId) {
@@ -82,10 +82,10 @@ public interface IDataStorage {
         return DATA_HANDLER.DATA_READER_REGISTRY.get(classId);
     }
 
-    public static <T extends IData> void writeDataToNBT(T data, NBTTagCompound nbt) {
+    public static <T extends IData> void writeDataToNBT(T data, @NotNull NBTTagCompound nbt) {
         // write the data tag list to nbt if needed
-        if (!nbt.hasKey(DATA_NBT_KEY )) {
-            nbt.setTag(DATA_NBT_KEY , new NBTTagList());
+        if (!nbt.hasKey(DATA_NBT_KEY)) {
+            nbt.setTag(DATA_NBT_KEY, new NBTTagList());
         }
 
         // prepare this instance to be added to nbt data
@@ -101,7 +101,7 @@ public interface IDataStorage {
     }
 
     public static ArrayList<IData> readDataFromNBT(NBTTagCompound nbt) {
-        if (!nbt.hasKey(DATA_NBT_KEY)) { return null; }
+        if (nbt == null || !nbt.hasKey(DATA_NBT_KEY)) { return null; }
         var result = new ArrayList<IData>();
 
         nbt.getTagList(DATA_NBT_KEY, 10).tagList.forEach(tag -> {
@@ -126,6 +126,7 @@ public interface IDataStorage {
     public static BigInteger bitsUsed(ArrayList<IData> data) {
         BigInteger bitsUsed = BigInteger.ZERO;
         if(data == null) return bitsUsed;
+
         for (var currData : data) {
             bitsUsed = bitsUsed.add(currData.numBits());
         }
@@ -144,8 +145,8 @@ public interface IDataStorage {
 
     // IO Specs
     public long maxCyclesPerSec();
-    public long numCyclesToWriteWord();
-    public long numCyclesToReadWord();
+    public long numBitsWrittenPerCycle();
+    public long numBitsReadPerCycle();
 
     // Stored data
     public BigInteger numBitsTaken(ItemStack stack);

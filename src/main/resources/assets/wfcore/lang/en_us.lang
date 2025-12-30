@@ -43,14 +43,17 @@ item.material.oreprefix.plateSextuple=Welded %s Plate
 
 # items
 item.radar_probe.name=Radar Debug Probe
+item.pen_drive.name=Pen Drive
 
 # info
-info.radar_probe.default=Used to show the names the radar will need to be supplied to target specific (tile) entities.
+info.radar_probe.default=Used to show the names the radar will need to be supplied to target specific (tile) entities in blue. The favourite tool of config slaves everywhere.
 info.radar_probe.advanced=The CASIO fx-9750GII is a cool programmable calculator
+info.data.no_data=NO DATA
+info.data.try_write=Writing EN
+info.data.not_try_write=Writing OFF
 info.data_storage.free=Free
 info.data_storage.taken=Taken
 info.pen_drive.default=Stores %s in an easy to transport form factor.
-
 
 # util/format
 wfcore.data.bit_or_bits=bit(s)
