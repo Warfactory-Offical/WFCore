@@ -1,8 +1,7 @@
 package wfcore.common.metatileentities.multi.electric;
 
 import com.google.common.collect.Lists;
-import com.modularmods.mcgltf.RenderedGltfScene;
-import com.modularmods.mcgltf.animation.InterpolatedChannel;
+import com.hbm.blocks.ModBlocks;
 import gregtech.api.capability.IEnergyContainer;
 import gregtech.api.capability.IMultipleTankHandler;
 import gregtech.api.capability.IObjectHolder;
@@ -25,13 +24,13 @@ import gregtech.api.metatileentity.multiblock.MultiblockWithDisplayBase;
 import gregtech.api.pattern.BlockPattern;
 import gregtech.api.pattern.FactoryBlockPattern;
 import gregtech.api.pattern.PatternMatchContext;
+import gregtech.api.unification.material.Materials;
 import gregtech.api.util.GTUtility;
-import gregtech.api.util.RelativeDirection;
 import gregtech.api.util.TextComponentUtil;
 import gregtech.client.renderer.ICubeRenderer;
 import gregtech.client.renderer.texture.Textures;
-import gregtech.common.blocks.BlockMachineCasing;
-import gregtech.common.blocks.BlockMetalCasing;
+import gregtech.common.blocks.BlockBoilerCasing;
+import gregtech.common.blocks.BlockTurbineCasing;
 import gregtech.common.blocks.MetaBlocks;
 import lombok.Getter;
 import net.minecraft.entity.player.EntityPlayer;
@@ -40,19 +39,21 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import org.jetbrains.annotations.NotNull;
-import wfcore.api.capability.data.IData;
 import wfcore.api.capability.data.IDataStorage;
 import wfcore.api.metatileentity.IAnimatedMTE;
 import wfcore.api.radar.MultiblockRadarLogic;
 import wfcore.api.util.math.ClusterData;
+import wfcore.client.render.WFTextures;
+import wfcore.common.blocks.BlockBoltableCasing;
+import wfcore.common.blocks.BlockMetalSheetCasing;
+import wfcore.common.blocks.BlockRegistry;
+import wfcore.common.materials.WFCoreMaterials;
+import wfcore.common.metatileentities.multi.WFPredicates;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -68,8 +69,10 @@ public class MetaTileEntityRadar extends MultiblockWithDisplayBase implements IA
     protected IMultipleTankHandler inputFluidInventory;
     protected IMultipleTankHandler outputFluidInventory;
     protected IEnergyContainer energyContainer;
-
-
+    @Getter
+    String animState = "idle";
+    @Getter
+    long animEpoch = 0l;
     private long tickCounter = 0;
     private boolean tryWrite = false;
 
@@ -83,34 +86,13 @@ public class MetaTileEntityRadar extends MultiblockWithDisplayBase implements IA
 
     }
 
-    @SideOnly(Side.CLIENT)
     @NotNull
     @Override
     protected ICubeRenderer getFrontOverlay() {
         // TODO: fix this only ever being called in the multi builder but not rendering in game
-        return Textures.BLAST_FURNACE_OVERLAY;
+        return WFTextures.OVERLAY_RADAR;
     }
 
-    // L = bottom (lower) concrete slab, S = Steel Casing, - = Air, N = Stainless Steel Casing,
-    // B = ULV Casing (bearing), s = steel frame, n = stainless frame, Z = Controller,
-    // R = right facing (looking at controller) top stair
-    @Override
-    protected @NotNull BlockPattern createStructurePattern() {
-        // direction subsequent chars, strings, and aisles travel in relative to controller faces, respectively
-        return FactoryBlockPattern.start(RelativeDirection.FRONT, RelativeDirection.UP, RelativeDirection.RIGHT)
-                .aisle("ZIE")
-                .where('Z', selfPredicate())
-                .where('I', abilities(MultiblockAbility.IMPORT_ITEMS).setExactLimit(1))
-                .where('E', abilities(MultiblockAbility.INPUT_ENERGY).setExactLimit(1))
-                //.where('P', states(MetaBlocks.MACHINE_CASING.getState(BlockMachineCasing.MachineCasingType.ULV))
-                //        .or(abilities(MultiblockAbility.INPUT_ENERGY)
-                //                .setMinGlobalLimited(1))
-                //        .or(abilities(MultiblockAbility.MAINTENANCE_HATCH)).setExactLimit(1))
-                //.where('I', states(MetaBlocks.MACHINE_CASING.getState(BlockMachineCasing.MachineCasingType.ULV)))
-                        //.or(abilities(MultiblockAbility.IMPORT_ITEMS)
-                                //.setMinGlobalLimited(1)))
-                .build();
-    }
 
     @Override
     public ICubeRenderer getBaseTexture(IMultiblockPart sourcePart) {
@@ -150,7 +132,9 @@ public class MetaTileEntityRadar extends MultiblockWithDisplayBase implements IA
         for (int slotId = 0; slotId < inputInventory.getSlots(); ++slotId) {
             // check if there is a data storage device/ stack
             var slotStack = inputInventory.getStackInSlot(slotId);  // DO NOT MODIFY STACK
-            if (!(slotStack.getItem() instanceof IDataStorage storage)) { return; }
+            if (!(slotStack.getItem() instanceof IDataStorage storage)) {
+                return;
+            }
 
             // check if we have data to store
             if (logic.lastScan != null) {
@@ -161,6 +145,7 @@ public class MetaTileEntityRadar extends MultiblockWithDisplayBase implements IA
             }
         }
     }
+
 
     @Override
     public void checkStructurePattern() {
@@ -174,6 +159,46 @@ public class MetaTileEntityRadar extends MultiblockWithDisplayBase implements IA
         logic.structureFormed();
     }
 
+    protected BlockPattern createStructurePattern() {
+        return
+        FactoryBlockPattern.start()
+                .aisle("                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "      OOOO      ", "      OOOO      ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ")
+                .aisle(" JJJEJ    JEJJJ ", "    H      H    ", "    H      H    ", "    H      H    ", "    H      H    ", "    H      H    ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "      OOOO      ", "    OO    OO    ", "    OO    OO    ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ")
+                .aisle(" JHEJJ    JJEHJ ", "   H        H   ", "   H        H   ", "   H        H   ", "   H        H   ", "   H        H   ", "    HH    HH    ", "    H H  H H    ", "    H  HH  H    ", "    H  HH  H    ", "    H H  H H    ", "   PPPPPPPPPP   ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "    OOOOOOOO    ", "   O   GG   O   ", "   O   GG   O   ", "       GG       ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ")
+                .aisle(" JEJJ      JJEJ ", "  H          H  ", "  H          H  ", "  H          H  ", "  H          H  ", "  H          H  ", "                ", "                ", "                ", "                ", "                ", "  PPJJJJJJJJPP  ", "   JJ      JJ   ", "    H      H    ", "    HH    HH    ", "    H H  H H    ", "    H  HH  H    ", "    H  HH  H    ", "    H H  H H    ", "    HH    HH    ", "    HHHHHHHH    ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "   OOOOOOOOOO   ", "  O          O  ", "  O          O  ", "                ", "       GG       ", "       GG       ", "       GG       ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ")
+                .aisle(" EJJ        JJE ", " H            H ", " H            H ", " H            H ", " H            H ", " H            H ", "  H          H  ", "  H          H  ", "  H          H  ", "  H          H  ", "  H          H  ", "  PJJJJJJJJJJP  ", "   JJ      JJ   ", "   H        H   ", "   H        H   ", "   H        H   ", "   H        H   ", "   H        H   ", "   H        H   ", "   H        H   ", "   H        H   ", "    H      H    ", "      PPPP      ", "      PPPP      ", "      PPPP      ", "      PPPP      ", "      PPPP      ", "      PPPP      ", "      PDDP      ", "       PP       ", "                ", "    OOOOOOO     ", "  OOO      OOO  ", " O            O ", " O            O ", "                ", "                ", "                ", "                ", "       GG       ", "       GG       ", "                ", "                ", "                ", "                ", "                ", "                ", "                ")
+                .aisle(" JJ    III   JJ ", "       INI      ", "       INI      ", "       III      ", "                ", "                ", "  H          H  ", "                ", "                ", "                ", "                ", "  PJJJJJJJJJJP  ", "                ", "                ", "   H        H   ", "                ", "                ", "                ", "                ", "   H        H   ", "   H        H   ", "                ", "     HPPMPH     ", "      PPPP      ", "      PPPP      ", "      PPPP      ", "      PPPP      ", "      PPPP      ", "      PDDP      ", "       PP       ", "                ", "    OOOOOOOO    ", "  OO        OO  ", " O            O ", " O            O ", "                ", "                ", "                ", "                ", "                ", "                ", "       GG       ", "       GG       ", "       GG       ", "                ", "                ", "                ", "                ")
+                .aisle("       III      ", "       NAN      ", "       NAN      ", "       III      ", "                ", "                ", "                ", "  H          H  ", "                ", "                ", "  H          H  ", "  PJJJJJJJJJJP  ", "           I    ", "                ", "                ", "   H        H   ", "                ", "                ", "   H        H   ", "                ", "   H        H   ", "                ", "    PPPPMPPP    ", "                ", "                ", "      FFFF      ", "       FF       ", "       FF       ", "       DD       ", "       DD       ", "      OOOO      ", "    OO    OO    ", " OOO        OOO ", "O              O", "O              O", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "       GG       ", "                ", "                ", "                ")
+                .aisle("       IMI      ", "       NMN      ", "       NMN      ", "       IMI      ", "        M       ", "        M       ", "        M       ", "        M       ", "  H     M    H  ", "  H     M    H  ", "        M       ", "  PJJJJJMMMMJP  ", "        M  C    ", "        M  L    ", "        M       ", "        M       ", "   H    M   H   ", "   H    M   H   ", "        M       ", "        M       ", "   H    M   H   ", "   H    M   H   ", "    PPPPMPPP    ", "                ", "                ", "      FFFF      ", "       FF       ", "       FF       ", "       DD       ", "       DD       ", "      OOOO      ", "    OO    OO    ", " OOO        OOO ", "O G          G O", "O G          G O", "  G          G  ", "   G        G   ", "   G        G   ", "   G        G   ", "    G      G    ", "    G      G    ", "     G    G     ", "     G    G     ", "     G    G     ", "      G  G      ", "       DD       ", "       DD       ", "                ")
+                .aisle("       III      ", "       III      ", "       III      ", "       III      ", "        I       ", "        I       ", "        I       ", "        I       ", "  H     I    H  ", "  H     I    H  ", "        I       ", "  PJJJJJJJJJJP  ", "           I    ", "           K    ", "                ", "                ", "   H        H   ", "   H        H   ", "                ", "                ", "   H        H   ", "   H        H   ", "    PPPPPPPP    ", "                ", "                ", "      FFFF      ", "       FF       ", "       FF       ", "       DD       ", "       DD       ", "      OOOO      ", "    OO    OO    ", " OOO        OOO ", "O G          G O", "O G          G O", "  G          G  ", "   G        G   ", "   G        G   ", "   G        G   ", "    G      G    ", "    G      G    ", "     G    G     ", "     G    G     ", "     G    G     ", "      G  G      ", "       DD       ", "       DD       ", "                ")
+                .aisle("                ", "                ", "                ", "                ", "                ", "                ", "                ", "  H          H  ", "                ", "                ", "  H          H  ", "  PJJJJJ JJJJP  ", "           I    ", "                ", "                ", "   H        H   ", "                ", "                ", "   H        H   ", "                ", "   H        H   ", "                ", "    PPPPPPPP    ", "                ", "                ", "      FFFF      ", "       FF       ", "       FF       ", "       DD       ", "       DD       ", "      OOOO      ", "    OO    OO    ", " OOO        OOO ", "O              O", "O              O", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "       GG       ", "                ", "                ", "                ")
+                .aisle(" JJ          JJ ", "                ", "                ", "                ", "                ", "                ", "  H          H  ", "                ", "                ", "                ", "                ", "  PJJJJJJJJJJP  ", "                ", "                ", "   H        H   ", "                ", "                ", "                ", "                ", "   H        H   ", "   H        H   ", "                ", "     HPPPPH     ", "      PPPP      ", "      PPPP      ", "      PPPP      ", "      PPPP      ", "      PPPP      ", "      PDDP      ", "       PP       ", "                ", "    OOOOOOOO    ", "  OO        OO  ", " O            O ", " O            O ", "                ", "                ", "                ", "                ", "                ", "                ", "       GG       ", "       GG       ", "       GG       ", "                ", "                ", "                ", "                ")
+                .aisle(" EJJ        JJE ", " H            H ", " H            H ", " H            H ", " H            H ", " H            H ", "  H          H  ", "  H          H  ", "  H          H  ", "  H          H  ", "  H          H  ", "  PJJJJJJJJJJP  ", "   JJ      JJ   ", "   H        H   ", "   H        H   ", "   H        H   ", "   H        H   ", "   H        H   ", "   H        H   ", "   H        H   ", "   H        H   ", "    H      H    ", "      PPPP      ", "      PPPP      ", "      PPPP      ", "      PPPP      ", "      PPPP      ", "      PPPP      ", "      PDDP      ", "       PP       ", "                ", "    OOOOOOOO    ", "  OOO      OOO  ", " O            O ", " O            O ", "                ", "                ", "                ", "                ", "       GG       ", "       GG       ", "                ", "                ", "                ", "                ", "                ", "                ", "                ")
+                .aisle(" JEJJ      JJEJ ", "  H          H  ", "  H          H  ", "  H          H  ", "  H          H  ", "  H          H  ", "                ", "                ", "                ", "                ", "                ", "  PBJJJJJJJJPP  ", "   JJ      JJ   ", "    H      H    ", "    HH    HH    ", "    H H  H H    ", "    H  HH  H    ", "    H  HH  H    ", "    H H  H H    ", "    HH    HH    ", "    HHHHHHHH    ", "       HH       ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "   OOOOOOOOOO   ", "  O          O  ", "  O          O  ", "                ", "       GG       ", "       GG       ", "       GG       ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ")
+                .aisle(" JHEJJ    JJEHJ ", "   H        H   ", "   H        H   ", "   H        H   ", "   H        H   ", "   H        H   ", "    HH    HH    ", "    H H  H H    ", "    H  HH  H    ", "    H  HH  H    ", "    H H  H H    ", "   PPPPPPPPPP   ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "    OOOOOOOO    ", "   O   GG   O   ", "   O   GG   O   ", "       GG       ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ")
+                .aisle(" JJJEJ    JEJJJ ", "    H      H    ", "    H      H    ", "    H      H    ", "    H      H    ", "    H      H    ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "      OOOO      ", "    OO    OO    ", "    OO    OO    ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ")
+                .aisle("                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "      OOOO      ", "      OOOO      ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ")
+                .where('G', frames(Materials.Aluminium))
+                .where('O', states(BlockRegistry.BOLTABLE_CASING.getState(BlockBoltableCasing.BoltableCasingType.BORON_COATED_BOLTED)))
+                .where('A', states(MetaBlocks.BOILER_CASING.getState(BlockBoilerCasing.BoilerCasingType.STEEL_PIPE)))
+                .where('E', WFPredicates.compressedBlocks(Materials.Steel))
+                .where('F', WFPredicates.compressedBlocks(Materials.Lead))
+                .where('M', blocks(ModBlocks.deco_red_copper))
+                .where('P', states(BlockRegistry.SHEET_CASING.getState(BlockMetalSheetCasing.MetalSheetCasingType.ALUMINIUM_SHEET_CASING)))
+                .where('H', frames(WFCoreMaterials.GalvanizedSteel))
+                .where('J', blocks(ModBlocks.concrete_smooth))
+                .where('L', blocks(ModBlocks.deco_crt))
+                .where('N', autoAbilities())
+                .where('B', states(BlockRegistry.SHEET_CASING.getState(BlockMetalSheetCasing.MetalSheetCasingType.ALUMINIUM_SHEET_CASING)))
+                .where('I', states(MetaBlocks.TURBINE_CASING.getState(BlockTurbineCasing.TurbineCasingType.STEEL_TURBINE_CASING)))
+                .where('K', blocks(ModBlocks.deco_crt))
+                .where('C', selfPredicate())
+                .where('D', WFPredicates.compressedBlocks(Materials.Aluminium))
+                .where('#', any())
+                .where(' ', air())
+                .build();
+
+    }
 
     @Override
     public void invalidateStructure() {
@@ -274,7 +299,6 @@ public class MetaTileEntityRadar extends MultiblockWithDisplayBase implements IA
         return builder;
     }
 
-
     @Override
     public AxisAlignedBB getRenderBoundingBox() {
         BlockPos p = getPos();
@@ -295,11 +319,6 @@ public class MetaTileEntityRadar extends MultiblockWithDisplayBase implements IA
     public BlockPos getLightPos() {
         return thisObject().getPos().up(15);
     }
-    @Getter
-    String animState = "idle";
-    @Getter
-    long animEpoch = 0l;
-
 
     @Override
     public boolean shouldRender() {
@@ -328,4 +347,6 @@ public class MetaTileEntityRadar extends MultiblockWithDisplayBase implements IA
         super.readFromNBT(data);
         logic.readFromNBT(data);
     }
+
+
 }
