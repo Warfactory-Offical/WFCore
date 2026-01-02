@@ -19,7 +19,7 @@ import wfcore.api.material.ore.WFCoreOrePrefix;
 import wfcore.api.material.ore.WFCoreRecipeHandler;
 import wfcore.common.blocks.BlockRegistry;
 import wfcore.common.items.ItemRegistry;
-import wfcore.common.materials.WFCoreMaterials;
+import wfcore.common.materials.WFMaterials;
 import wfcore.common.metatileentities.WFCoreMetaTileEntities;
 import wfcore.common.recipe.GregtechRecipes;
 import wfcore.common.recipe.VanillaRecipes;
@@ -35,7 +35,7 @@ public class RegistryEvents {
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     public void registerMaterials(@NotNull MaterialEvent event) {
-        WFCoreMaterials.register();
+        WFMaterials.register();
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)

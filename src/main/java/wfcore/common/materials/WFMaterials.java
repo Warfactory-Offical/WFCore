@@ -16,7 +16,7 @@ import static gregtech.api.unification.material.info.MaterialFlags.GENERATE_DOUB
 import static gregtech.api.unification.material.info.MaterialIconSet.METALLIC;
 import static gregtech.api.util.GTUtility.gregtechId;
 
-public class WFCoreMaterials {
+public class WFMaterials {
     private static final AtomicBoolean INIT = new AtomicBoolean(false);
     public static Material AdvancedAlloy;
     public static Material Desh;

@@ -16,7 +16,7 @@ import static gregtech.api.unification.material.Materials.*;
 import static gregtech.api.unification.material.info.MaterialFlags.*;
 import static gregtech.api.unification.material.info.MaterialIconSet.METALLIC;
 import static gregtech.api.util.GTUtility.gregtechId;
-import static wfcore.common.materials.WFCoreMaterials.*;
+import static wfcore.common.materials.WFMaterials.*;
 
 public class HbmMaterials {
     public static void register(AtomicInteger id) {

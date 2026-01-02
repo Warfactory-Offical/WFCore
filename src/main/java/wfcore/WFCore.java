@@ -1,29 +1,15 @@
 package wfcore;
 
-import net.minecraft.block.Block;
-import net.minecraft.client.Minecraft;
-import net.minecraft.item.Item;
-import net.minecraft.item.crafting.IRecipe;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.entity.EntityEvent;
 import net.minecraftforge.event.world.BlockEvent;
-import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.*;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.relauncher.Side;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import wfcore.api.radar.MultiblockRadarLogic;
 import wfcore.common.proxy.CommonProxy;
-import wfcore.common.recipe.GregtechRecipes;
-import wfcore.common.recipe.HBMRecepies;
-import wfcore.common.recipe.VanillaRecipes;
-import wfcore.common.recipe.chain.LargeBlastFurnace;
-import wfcore.common.recipe.chain.SteamWiremillRecipes;
 
 @Mod(modid = Tags.MODID, version = Tags.VERSION, name = Tags.MODNAME, acceptedMinecraftVersions = "[1.12.2]",
         dependencies = "after:hbm;after:mcheli;required-before:gregtech;required-after-client:mcgltf;required-client:ctm"
