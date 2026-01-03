@@ -1,11 +1,7 @@
 package wfcore.api.radar;
 
 import com.mojang.realmsclient.util.Pair;
-import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
-import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
+import it.unimi.dsi.fastutil.objects.*;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -37,24 +33,22 @@ import static wfcore.api.util.LogUtil.logExceptionWithTrace;
 
 public class MultiblockRadarLogic {
     //TODO: Make those values adjustable in GUI
-    public int MIN_PTS = 1;
-    public int EPS = 10;
+    public static final int MIN_PTS = 1;
+    public static final int EPS = 10;
 
     private int voltageTier;
     private int overclockAmount;
-    private Map<IntCoord2, Object> LoadedValidObjects  = new HashMap<>();
-    private static Object2ObjectOpenHashMap<UUID, List<ClusterData>> SCAN_RESULTS = new Object2ObjectOpenHashMap<>();
-    public List<ClusterData> lastScan = new ArrayList<>();
-    private MetaTileEntityRadar metaTileEntity;
+    public List<ClusterData> lastScan = null;
+    private final MetaTileEntityRadar metaTileEntity;
     private boolean isActive;
     private boolean canWork;
 
     public static ObjectOpenHashSet<RadarTargetIdentifier> TE_WHITELIST = new ObjectOpenHashSet<>();
     public static ObjectOpenHashSet<RadarTargetIdentifier> ENTITY_WHITELIST = new ObjectOpenHashSet<>();
 
-    private static Path CONFIG_PATH = Paths.get("config/" + WFCore.MODID + "/radar.cfg");
+    private static final Path CONFIG_PATH = Paths.get("config/" + WFCore.MODID + "/radar.cfg");
 
-    private static List<String> EXAMPLE_YAML = Collections.unmodifiableList(Arrays.asList(
+    private static final List<String> EXAMPLE_YAML = List.of(
             "# Controls basic radar functionality",
             "# Supports various types of targets divided into named categories of varying \"brightness\" to radars.",
             "blocks:",
@@ -67,7 +61,7 @@ public class MultiblockRadarLogic {
             "   targets:",
             "     - gregtech:machine.energy_hatch.input.lv.name",
             "     - hbm:tileentity_bobble"
-    ));
+    );
 
     // this may be useful eventually, but currently handling each mod's method of registering tile entities is too involved
     public static void readRadarConfig() {
@@ -150,53 +144,10 @@ public class MultiblockRadarLogic {
         isActive = false;
     }
 
-    // read the result and return a copy of the list
-    public Pair<UUID, List<ClusterData>> readScanResult(UUID key, boolean doDeletion) {
-        return accessScanResults(new ArrayList<>(), key);
-    }
-
-    // returns the key assigned to the given input
-    public UUID addScanResult(List<ClusterData> input) {
-        return accessScanResults(input, null).first();
-    }
-
     // synchronized access for reading or write to the scan results, with the returned object being a
     @NotNull
-    private synchronized Pair<UUID, @NotNull List<ClusterData>> accessScanResults(List<ClusterData> input, UUID key) {
-        // if a key exists, we must be doing a read
-        if (key != null) {
-            // if the input is null we are just reading
-            if (input == null) {
-                return Pair.of(key, new ArrayList<>(SCAN_RESULTS.get(key)));
-            }
-
-            // if the input is an empty list we are doing a read w/ delete
-            if (input.size() == 0) {
-                Pair<UUID, List<ClusterData>> result = Pair.of(key, new ArrayList<>(SCAN_RESULTS.get(key)));
-                SCAN_RESULTS.remove(key);
-                return result;
-            }
-
-            // an input must have been passed with a key, which is not defined and so will be ignored
-            return Pair.of(key, new ArrayList<>());
-        }
-
-        // generate an initial key assuming no other inserts have occurred at this time in milliseconds
-        final long INSERT_TIME = System.currentTimeMillis();
-        long keyIdx = 0;
-        key = new UUID(keyIdx, INSERT_TIME);
-
-        // its unlikely enough scans finish w/in the same ms that this linear search becomes an issue; fix this if it does
-        while (SCAN_RESULTS.containsKey(key)) {
-            key = new UUID(++keyIdx, INSERT_TIME);
-        }
-
-        // insert the data with the given key
-        SCAN_RESULTS.put(key, input);
-        lastScan = new ArrayList<>(input);  // make a copy to use within this specific logic instance
-
-        // return the key created for the data passed as the only entry in the set
-        return Pair.of(key, input);
+    private synchronized void storeScanResult(List<ClusterData> input) {
+        lastScan = input;
     }
 
     private boolean canScan() {
@@ -222,10 +173,10 @@ public class MultiblockRadarLogic {
         //Scanner cannot perform a scan if data is already written
         if(true || !dataSlotIsEmpty() && !dataSlotIsWritten()){
             //Get the snapshot of all loaded players TEs
-            this.LoadedValidObjects  = this.collectValidEntites();
+            Map<IntCoord2, Object> loadedValidObjects = this.collectValidEntites();
             //Run dbscan
             //this.scanResults = clusterData;
-            calculateDBSCAN(LoadedValidObjects).thenAccept(this::addScanResult).exceptionally(ex -> {
+            calculateDBSCAN(loadedValidObjects).thenAccept(this::storeScanResult).exceptionally(ex -> {
                 System.err.println("Error during DBSCAN calculation: " + ex.getMessage());
                 return null;
             });
@@ -354,7 +305,8 @@ public class MultiblockRadarLogic {
     }
 
     public NBTTagCompound writeToNBT(NBTTagCompound data) {
-        if (lastScan.size() == 0) { return data; }
+        if (lastScan == null) { return data; }
+        if (lastScan.isEmpty()) { return data; }
 
         NBTTagList lastScan = new NBTTagList();
         this.lastScan.forEach(scanResult -> lastScan.appendTag(scanResult.toNBT()));

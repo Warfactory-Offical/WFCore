@@ -8,6 +8,7 @@ import wfcore.api.capability.data.DataHandler;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class ClusterData implements IData {
     public final List<IntCoord2> coordinates;
@@ -89,7 +90,7 @@ public class ClusterData implements IData {
     }
 
     @Override
-    public DataHandler.DataClassIdentifier getId() {
+    public DataHandler.DataClassIdentifier getTypeId() {
         return DataHandler.DataClassIdentifier.CLUSTER_DATA;
     }
 

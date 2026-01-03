@@ -9,12 +9,12 @@ import java.util.function.Function;
 public class DataHandler {
     // do not change the id's used here or else pre-existing saves will lose data
     public enum DataClassIdentifier {
-        CLUSTER_DATA(0);
+        CLUSTER_DATA(ClusterData.class);
 
-        final int id;
+        public final Class<? extends IData> clazz;
 
-        DataClassIdentifier(int id) {
-            this.id = id;
+        DataClassIdentifier(final Class<? extends IData> clazz) {
+            this.clazz = clazz;
         }
     }
 
@@ -26,7 +26,7 @@ public class DataHandler {
     }
 
     public void registerDataClass(DataClassIdentifier dataClass, Function<NBTTagCompound, ? extends IData> fromNBT) {
-        DATA_READER_REGISTRY.put(dataClass.id, fromNBT);
+        DATA_READER_REGISTRY.put(dataClass.ordinal(), fromNBT);
     }
 
     public DataHandler initializeDataHandler() {

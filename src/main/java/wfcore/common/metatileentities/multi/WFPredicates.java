@@ -16,7 +16,6 @@ public class WFPredicates {
 
     public static TraceabilityPredicate compressedBlocks(Material... frameMaterials) {
         return states(Arrays.stream(frameMaterials).map(m -> MetaBlocks.COMPRESSED.get(m).getBlock(m))
-                .toArray(IBlockState[]::new))
-                ;
+                .toArray(IBlockState[]::new));
     }
 }

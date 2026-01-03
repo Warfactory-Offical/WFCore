@@ -2,20 +2,19 @@ package wfcore.api.capability.data;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.jetbrains.annotations.NotNull;
-import wfcore.WFCore;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.function.Function;
 
+// TODO: this could use such a massive rewrite; some type of filesystem implementation would be helpful
 public interface IDataStorage {
+    // UTILITY
     public static long K = 1_000L;
     public static long M = 1_000_000L;
     public static long G = 1_000_000_000L;
@@ -36,13 +35,6 @@ public interface IDataStorage {
     public static String[] prefixNames = {
             "", "k", "M", "G", "T", "P", "E", "Z", "Y"
     };
-
-    // each data inheritor must specify the method it uses to create an instance of itself from NBT
-    public static DataHandler DATA_HANDLER = new DataHandler().initializeDataHandler();
-
-    // DO NOT CHANGE - WILL AFFECT SAVED NBT DATA
-    public static String DATA_NBT_KEY = "wfc_data";
-    public static String DATA_CLASS_ID_KEY = "data_class_id";
 
     // set num decimal places to -1 to get full answer
     @SideOnly(Side.CLIENT)
@@ -74,55 +66,6 @@ public interface IDataStorage {
                 + prefixNames[prefixFlooredPowOfTen] + "b");
     }
 
-    private static boolean hasClassId(int classId) {
-        return DATA_HANDLER.DATA_READER_REGISTRY.containsKey(classId);
-    }
-
-    private static Function<NBTTagCompound, ? extends IData> getNBTSupplier(int classId) {
-        return DATA_HANDLER.DATA_READER_REGISTRY.get(classId);
-    }
-
-    public static <T extends IData> void writeDataToNBT(T data, @NotNull NBTTagCompound nbt) {
-        // write the data tag list to nbt if needed
-        if (!nbt.hasKey(DATA_NBT_KEY)) {
-            nbt.setTag(DATA_NBT_KEY, new NBTTagList());
-        }
-
-        // prepare this instance to be added to nbt data
-        var thisNBT = data.toNBT();
-        thisNBT.setInteger(DATA_CLASS_ID_KEY, data.getId().id);
-
-        // add this instance to the nbt
-        var dataList = nbt.getTagList(DATA_NBT_KEY , 10);
-        dataList.appendTag(thisNBT);
-
-        // store into nbt
-        nbt.setTag(DATA_NBT_KEY, dataList);
-    }
-
-    public static ArrayList<IData> readDataFromNBT(NBTTagCompound nbt) {
-        if (nbt == null || !nbt.hasKey(DATA_NBT_KEY)) { return null; }
-        var result = new ArrayList<IData>();
-
-        nbt.getTagList(DATA_NBT_KEY, 10).tagList.forEach(tag -> {
-            var tagCompound = (NBTTagCompound) tag;
-            if (!tagCompound.hasKey(DATA_CLASS_ID_KEY)) {
-                WFCore.LOGGER.atError().log("Malformed data nbt found w/o id tag (" + tagCompound.toString() + "), ignoring");
-                return;
-            }
-
-            int classId = tagCompound.getInteger(DATA_CLASS_ID_KEY);
-            if (!hasClassId(classId)) {
-                WFCore.LOGGER.atError().log("Malformed data nbt found w/ unknown id (" + tagCompound.toString() + "), ignoring");
-                return;
-            }
-
-            result.add(getNBTSupplier(classId).apply(tagCompound));
-        });
-
-        return result;
-    }
-
     public static BigInteger bitsUsed(ArrayList<IData> data) {
         BigInteger bitsUsed = BigInteger.ZERO;
         if(data == null) return bitsUsed;
@@ -134,24 +77,31 @@ public interface IDataStorage {
         return bitsUsed;
     }
 
-
     // IO Capabilities
-    public boolean canRead();
-    public boolean canWrite();
-    public boolean doOverwrites();
+    boolean canRead();
+    boolean canWrite();
+    boolean doOverwrites();
 
     // Storage capabilities
-    public BigInteger bitCapacity();
+    BigInteger bitCapacity();
 
     // IO Specs
-    public long maxCyclesPerSec();
-    public long numBitsWrittenPerCycle();
-    public long numBitsReadPerCycle();
+    long maxCyclesPerSec();
+    long numBitsWrittenPerCycle();
+    long numBitsReadPerCycle();
+
+    // TODO: handle sub single EU writes/reads
+    long energyPerWrite();
+    long energyPerRead();
+    long operatingVoltage();
 
     // Stored data
-    public BigInteger numBitsTaken(ItemStack stack);
-    public BigInteger numBitsFree(ItemStack stack);
-    public boolean writeData(ItemStack stack, ArrayList<IData> data);
-    public ArrayList<IData> readData(ItemStack stack);
-
+    BigInteger numBitsTaken(@NotNull ItemStack stack);
+    BigInteger numBitsFree(@NotNull ItemStack stack);
+    NBTTagCompound getStorageNBT(ItemStack stack);
+    boolean hasData(ItemStack stack, String path);
+    boolean deleteData(ItemStack stack, String path);
+    boolean writeData(ItemStack stack, IData data);  // convenience for when path doesn't matter (use default path)
+    boolean writeData(ItemStack stack, String path, IData data);
+    ArrayList<IData> readData(ItemStack stack, String path);
 }

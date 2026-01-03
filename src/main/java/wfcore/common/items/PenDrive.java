@@ -6,7 +6,6 @@ import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.text.*;
-import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -14,12 +13,14 @@ import org.jetbrains.annotations.NotNull;
 import org.lwjgl.input.Keyboard;
 import wfcore.api.capability.data.IData;
 import wfcore.api.capability.data.IDataStorage;
+import wfcore.api.capability.data.NBTFileSys;
 
 import javax.annotation.Nullable;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
+// TODO: make this extend a base "data storage" item class
 public class PenDrive extends BaseItem implements IDataStorage {
     private final static BigInteger BIT_CAPACITY = BigInteger.valueOf(16 * G);
 
@@ -120,8 +121,23 @@ public class PenDrive extends BaseItem implements IDataStorage {
     }
 
     @Override
+    public long energyPerWrite() {
+        return 0;
+    }
+
+    @Override
+    public long energyPerRead() {
+        return 0;
+    }
+
+    @Override
+    public long operatingVoltage() {
+        return 0;
+    }
+
+    @Override
     public BigInteger numBitsTaken(ItemStack stack) {
-        return IDataStorage.bitsUsed(readData(stack));
+        return IDataStorage.bitsUsed(readData(stack, NBTFileSys.ROOT_PATH));
     }
 
     @Override
@@ -130,26 +146,45 @@ public class PenDrive extends BaseItem implements IDataStorage {
     }
 
     @Override
-    public boolean writeData(ItemStack stack, ArrayList<IData> data) {
-        var bitsNeeded = IDataStorage.bitsUsed(data);
-        var bitsAvailable = numBitsFree(stack);
-
-        // not enough space to store
-        if (bitsNeeded.compareTo(bitsAvailable) > 0) {
-            return false;
-        }
-
-        // read the nbt, update it, and write back
-        var stackNBT = stack.getTagCompound() == null ? new NBTTagCompound() : stack.getTagCompound();
-        data.forEach(dataInst -> IDataStorage.writeDataToNBT(dataInst, stackNBT));
-        stack.setTagCompound(stackNBT);
-
-        return true;
+    public NBTTagCompound getStorageNBT(ItemStack stack) {
+        return null;
     }
 
     @Override
-    public ArrayList<IData> readData(ItemStack stack) {
-        return IDataStorage.readDataFromNBT(stack.getTagCompound());
+    public boolean hasData(ItemStack stack, String path) {
+        return false;
+    }
+
+    @Override
+    public boolean deleteData(ItemStack stack, String path) {
+        return false;
+    }
+
+    @Override
+    public boolean writeData(ItemStack stack, IData data) {
+        return writeData(stack, NBTFileSys.ROOT_PATH, data);
+    }
+
+    @Override
+    public boolean writeData(ItemStack stack, String path, IData data) {
+        var stackNBT = stack.getTagCompound();
+        if (stackNBT == null) {
+            stackNBT = new NBTTagCompound();
+            stack.setTagCompound(stackNBT);
+        }
+
+        return NBTFileSys.writeData(stackNBT, path, data);
+    }
+
+    @Override
+    public ArrayList<IData> readData(ItemStack stack, String path) {
+        var stackNBT = stack.getTagCompound();
+        if (stackNBT == null) {
+            // if there is no stack nbt there is definitely no data
+            return new ArrayList<>();
+        }
+
+        return NBTFileSys.readData(stackNBT, path);
     }
 
 }
