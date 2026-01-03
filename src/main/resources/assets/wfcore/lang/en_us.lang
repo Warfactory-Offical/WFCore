@@ -29,6 +29,7 @@ gregtech.material.c_m_b_steel=CMB Steel
 gregtech.material.schrabidium=Schrabidium
 gregtech.material.australium=Australium
 gregtech.material.verticium=Verticium
+gregtech.material.galvanized_steel=Galvanized Steel
 
 gregtech.machine.boiler_tower.height=Stack Height: %s §9blocks
 
@@ -45,11 +46,16 @@ item.material.oreprefix.plateSextuple=Welded %s Plate
 item.radar_probe.name=Radar Debug Probe
 item.pen_drive.name=Pen Drive
 
+# blocks
+tile.sheet_casing.aluminum_sheet.name=Aluminium sheet casing
+tile.casing_boltable.boron_coated.name=Boron-coated casing
+tile.casing_boltable.boron_coated_bolted.name=Boron-coated casing (Bolted)
+
 # info
 info.radar_probe.default=Used to show the names the radar will need to be supplied to target specific (tile) entities in blue. The favourite tool of config slaves everywhere.
 info.radar_probe.advanced=The CASIO fx-9750GII is a cool programmable calculator
 info.data.no_data=NO DATA
-info.data.try_write=Writing EN
+info.data.try_write=Writing ON
 info.data.not_try_write=Writing OFF
 info.data_storage.free=Free
 info.data_storage.taken=Taken
